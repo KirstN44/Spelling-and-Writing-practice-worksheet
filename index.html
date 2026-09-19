@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spelling & Phonics Worksheet Generator</title>
+  <meta name="description" content="Customisable printable spelling and phonics worksheet generator with primary handwriting guidelines, fill-in-the-blank sentences, word search puzzles, and crisp print styling.">
+  
+  <!-- Google Fonts for Educational & Dyslexia-friendly Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Comic+Neue:wght@400;700&family=Lexend:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* -------------------------------------------------------------
+       GLOBAL RESETS & DESIGN SYSTEM (Vanilla CSS)
+    ------------------------------------------------------------- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-lexend: 'Lexend', sans-serif;
+      --font-comic: 'Comic Neue', cursive, sans-serif;
+      --font-andika: 'Andika', sans-serif;
+      
+      --color-primary: #4f46e5;
+      --color-primary-hover: #4338ca;
+      --color-slate-900: #0f172a;
+      --color-slate-800: #1e293b;
+      --color-slate-700: #334155;
+      --color-slate-600: #475569;
+      --color-slate-500: #64748b;
+      --color-slate-400: #94a3b8;
+      --color-slate-300: #cbd5e1;
+      --color-slate-200: #e2e8f0;
+      --color-slate-100: #f1f5f9;
+      --color-slate-50: #f8fafc;
+      --color-amber-500: #f59e0b;
+      --color-emerald-600: #059669;
+      --color-rose-600: #e11d48;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: #f1f5f9;
+      color: var(--color-slate-900);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* -------------------------------------------------------------
+       TOP NAVIGATION BAR
+    ------------------------------------------------------------- */
+    .top-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--color-slate-200);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--color-primary);
+      color: #ffffff;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .brand-title {
+      font-family: var(--font-lexend);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-slate-900);
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--color-slate-500);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      font-family: var(--font-main);
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: #ffffff;
+    }
+    .btn-primary:hover { background: var(--color-primary-hover); }
+
+    .btn-secondary {
+      background: #ffffff;
+      border-color: var(--color-slate-300);
+      color: var(--color-slate-700);
+    }
+    .btn-secondary:hover {
+      background: var(--color-slate-50);
+      border-color: var(--color-slate-400);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 11px;
+      border-radius: 6px;
+    }
+
+    /* -------------------------------------------------------------
+       MAIN TWO-COLUMN WORKSPACE
+    ------------------------------------------------------------- */
+    .app-workspace {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 61px);
+      overflow: hidden;
+    }
+
+    /* SIDEBAR CONTROL PANEL */
+    .control-sidebar {
+      width: 420px;
+      flex-shrink: 0;
+      background: #ffffff;
+      border-right: 1px solid var(--color-slate-200);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .tabs-nav {
+      display: flex;
+      background: var(--color-slate-50);
+      border-bottom: 1px solid var(--color-slate-200);
+      padding: 6px 8px 0 8px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-slate-500);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      border-radius: 6px 6px 0 0;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--color-primary);
+      background: #ffffff;
+      border-bottom: 2px solid var(--color-primary);
+      box-shadow: 0 -1px 2px rgba(0,0,0,0.03);
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      background: var(--color-slate-50);
+      border-top: 1px solid var(--color-slate-200);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* FORM CONTROLS */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-family: var(--font-lexend);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-slate-800);
+    }
+
+    .form-help {
+      font-size: 11px;
+      color: var(--color-slate-500);
+    }
+
+    .form-textarea, .form-input, .form-select {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-family: inherit;
+      border: 1px solid var(--color-slate-300);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--color-slate-900);
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-textarea:focus, .form-input:focus, .form-select:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+    }
+
+    .form-checkbox-card {
+      padding: 12px;
+      background: var(--color-slate-50);
+      border: 1px solid var(--color-slate-200);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-slate-800);
+      cursor: pointer;
+    }
+
+    .sub-options {
+      padding-left: 24px;
+      border-top: 1px solid var(--color-slate-200);
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .sub-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .word-chips-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 10px;
+      background: var(--color-slate-50);
+      border: 1px solid var(--color-slate-200);
+      border-radius: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .word-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid var(--color-slate-300);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-lexend);
+      color: var(--color-slate-800);
+    }
+
+    .word-chip .chip-remove {
+      color: var(--color-slate-400);
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .word-chip .chip-remove:hover { color: var(--color-rose-600); }
+
+    /* PREVIEW VIEWPORT */
+    .preview-viewport {
+      flex: 1;
+      background: #cbd5e1;
+      overflow-y: auto;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      position: relative;
+    }
+
+    .preview-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(6px);
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-slate-700);
+    }
+
+    /* -------------------------------------------------------------
+       WORKSHEET SHEET CONTAINER (SCREEN & PRINT)
+    ------------------------------------------------------------- */
+    .worksheet-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      background: #ffffff;
+      padding: 28mm 20mm 20mm 20mm;
+      color: var(--color-slate-900);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: transform 0.15s ease;
+      transform-origin: top center;
+    }
+
+    .worksheet-sheet.letter-size {
+      width: 8.5in;
+      min-height: 11in;
+    }
+
+    .worksheet-sheet.border-classic {
+      border: 2px solid var(--color-slate-900);
+    }
+
+    .worksheet-sheet.border-dashed {
+      border: 2px dashed var(--color-slate-900);
+      border-radius: 12px;
+    }
+
+    .worksheet-sheet.border-none {
+      border: 1px solid transparent;
+    }
+
+    /* Font Family Overrides */
+    .font-lexend { font-family: var(--font-lexend); }
+    .font-school { font-family: var(--font-comic); }
+    .font-andika { font-family: var(--font-andika); }
+
+    /* WORKSHEET HEADER */
+    .sheet-header {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .student-meta-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--color-slate-900);
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .meta-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .meta-line {
+      display: inline-block;
+      border-bottom: 2px solid var(--color-slate-900);
+      height: 18px;
+      vertical-align: bottom;
+      margin-left: 6px;
+    }
+
+    .name-line { min-width: 160px; }
+    .date-line { min-width: 110px; }
+
+    .grade-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      background: var(--color-slate-100);
+      border: 1px solid var(--color-slate-300);
+      border-radius: 4px;
+    }
+
+    .meta-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-indicator {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-slate-600);
+    }
+
+    .score-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 2px solid var(--color-slate-900);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .sheet-title-box {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .sheet-main-title {
+      font-size: 22px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-slate-900);
+    }
+
+    .sheet-sub-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-slate-700);
+      margin-top: 4px;
+    }
+
+    .sheet-instructions {
+      font-size: 11px;
+      color: var(--color-slate-600);
+      font-style: italic;
+      margin-top: 4px;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* SECTION HEADERS */
+    .module-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--color-slate-900);
+      padding-bottom: 6px;
+      margin-bottom: 16px;
+    }
+
+    .module-title-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .module-badge {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--color-slate-900);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .module-heading {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-slate-900);
+    }
+
+    .module-hint {
+      font-size: 11px;
+      font-style: italic;
+      color: var(--color-slate-600);
+    }
+
+    /* -------------------------------------------------------------
+       ACTIVITY 1: HANDWRITING LINES (100% BLANK WITH MIDLINE)
+    ------------------------------------------------------------- */
+    .handwriting-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 24px;
+    }
+
+    .handwriting-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .word-prompt {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-slate-900);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .word-prompt .num {
+      color: var(--color-slate-500);
+      font-size: 11px;
+    }
+
+    /* Pure CSS 3-Line Primary Ruling */
+    .ruled-line-box {
+      width: 100%;
+      position: relative;
+      background: #ffffff;
+      border-top: 2px solid var(--color-slate-900);
+      border-bottom: 2px solid var(--color-slate-900);
+      margin-bottom: 4px;
+    }
+
+    .ruled-line-box.spacing-compact { height: 40px; }
+    .ruled-line-box.spacing-normal { height: 50px; }
+    .ruled-line-box.spacing-spacious { height: 62px; }
+
+    .ruled-line-box .dashed-midline {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      border-top: 1.5px dashed #64748b;
+    }
+
+    /* -------------------------------------------------------------
+       ACTIVITY 2: SENTENCE COMPLETION & CONTEXT
+    ------------------------------------------------------------- */
+    .word-bank-container {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--color-slate-50);
+      border: 2px dashed var(--color-slate-400);
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .word-bank-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-slate-800);
+      margin-right: 8px;
+    }
+
+    .bank-word-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1.5px solid var(--color-slate-300);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .checkbox-square {
+      width: 12px;
+      height: 12px;
+      border: 1.5px solid var(--color-slate-800);
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .sentence-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sentence-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      line-height: 2.2;
+      color: var(--color-slate-900);
+    }
+
+    .sentence-num {
+      font-weight: 700;
+      color: var(--color-slate-600);
+      min-width: 20px;
+    }
+
+    .write-blank-line {
+      display: inline-block;
+      min-width: 120px;
+      border-bottom: 2px solid var(--color-slate-900);
+      margin: 0 6px;
+      height: 20px;
+      vertical-align: bottom;
+    }
+
+    /* -------------------------------------------------------------
+       ACTIVITY 3: WORD SEARCH PUZZLE
+    ------------------------------------------------------------- */
+    .word-search-layout {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .grid-container {
+      display: inline-grid;
+      gap: 2px;
+      background: var(--color-slate-900);
+      padding: 3px;
+      border: 2px solid var(--color-slate-900);
+      border-radius: 8px;
+      user-select: none;
+    }
+
+    .grid-cell {
+      width: 32px;
+      height: 32px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-family: var(--font-lexend);
+    }
+
+    .grid-cell.highlight-solution {
+      background: #fef08a !important;
+      color: #0f172a !important;
+      font-weight: 900 !important;
+    }
+
+    .checklist-container {
+      flex: 1;
+      max-width: 240px;
+    }
+
+    .checklist-heading {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-slate-800);
+      margin-bottom: 10px;
+    }
+
+    .checklist-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* -------------------------------------------------------------
+       ACTIVITY 4 & 5: SCRAMBLE & ABC SORT
+    ------------------------------------------------------------- */
+    .scramble-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .scramble-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border: 1px solid var(--color-slate-300);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .letter-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .scramble-letter-badge {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-slate-100);
+      border: 1.5px solid var(--color-slate-800);
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .scramble-boxes {
+      display: flex;
+      gap: 4px;
+    }
+
+    .scramble-blank-box {
+      width: 26px;
+      height: 26px;
+      border-bottom: 2px solid var(--color-slate-900);
+      background: var(--color-slate-50);
+    }
+
+    .abc-sort-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 32px;
+    }
+
+    .abc-sort-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .abc-sort-row .num {
+      font-weight: 700;
+      font-size: 13px;
+      min-width: 20px;
+    }
+
+    .abc-sort-row .ruled-bottom {
+      flex: 1;
+      border-bottom: 2px solid var(--color-slate-900);
+      height: 24px;
+    }
+
+    /* SHEET FOOTER */
+    .sheet-footer {
+      margin-top: 24px;
+      padding-top: 10px;
+      border-top: 1px solid var(--color-slate-300);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--color-slate-500);
+      font-family: var(--font-lexend);
+    }
+
+    /* -------------------------------------------------------------
+       PRINT MEDIA QUERY (Clean A4/Letter Output)
+    ------------------------------------------------------------- */
+    @media print {
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .app-workspace {
+        height: auto !important;
+        display: block !important;
+        overflow: visible !important;
+      }
+
+      .preview-viewport {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+      }
+
+      .worksheet-sheet {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        transform: none !important;
+      }
+
+      .worksheet-sheet:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
+
+      .avoid-break-inside {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+
+      @page {
+        size: auto;
+        margin: 10mm 15mm 10mm 15mm;
+      }
+
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP APP HEADER -->
+  <header class="top-header no-print">
+    <div class="header-brand">
+      <div class="brand-icon">✏️</div>
+      <div>
+        <div class="brand-title">Spelling & Phonics Worksheet Generator</div>
+        <div class="brand-subtitle">Interactive Standalone Printable Tool</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" onclick="window.print()">
+        🖨️ Print / Save PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="app-workspace">
+    
+    <!-- LEFT SIDEBAR CONTROL PANEL -->
+    <aside class="control-sidebar no-print">
+      <!-- Tabs Navigation -->
+      <nav class="tabs-nav">
+        <button class="tab-btn active" onclick="switchTab('words')">Words (<span id="tab-word-count">6</span>)</button>
+        <button class="tab-btn" onclick="switchTab('sentences')">Custom Sentences</button>
+        <button class="tab-btn" onclick="switchTab('activities')">Activities</button>
+        <button class="tab-btn" onclick="switchTab('page-setup')">Page Setup</button>
+      </nav>
+
+      <!-- Sidebar Tab Panes -->
+      <div class="sidebar-content">
+        
+        <!-- TAB 1: WORDS INPUT -->
+        <div id="tab-pane-words" class="tab-pane">
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label">Type or Paste Spelling Words:</label>
+            <div class="form-help" style="margin-bottom: 6px;">Separate words by commas or line breaks.</div>
+            <textarea id="word-input" class="form-textarea" rows="4" placeholder="e.g. cat, bed, pig, dot, sun, hat"></textarea>
+            <button class="btn btn-primary btn-sm" onclick="addWordsFromInput()" style="margin-top: 6px; width: 100%;">
+              + Add Words to Worksheet
+            </button>
+          </div>
+
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span class="form-label">Active Word List:</span>
+              <button class="btn btn-secondary btn-sm" onclick="clearAllWords()" style="color: var(--color-rose-600); border-color: transparent;">
+                Clear All
+              </button>
+            </div>
+            <div id="word-chips-container" class="word-chips-box">
+              <!-- Dynamically populated chips -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: CUSTOM SENTENCES -->
+        <div id="tab-pane-sentences" class="tab-pane" style="display: none;">
+          <div style="padding: 10px; background: #e0e7ff; border-radius: 8px; font-size: 11px; color: #3730a3; margin-bottom: 16px;">
+            <strong>💡 Custom Context Sentences:</strong><br>
+            Write a sentence for each word. Use <code>______</code> for the blank, or type the target word directly and it will be replaced with a blank line.
+          </div>
+          <div id="custom-sentences-list" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Dynamically populated sentence inputs -->
+          </div>
+        </div>
+
+        <!-- TAB 3: ACTIVITIES MODULES -->
+        <div id="tab-pane-activities" class="tab-pane" style="display: none;">
+          <div class="form-group" style="gap: 12px;">
+            
+            <!-- Module 1: Handwriting -->
+            <div class="form-checkbox-card">
+              <label class="checkbox-label">
+                <input type="checkbox" id="mod-handwriting" checked onchange="updateConfig()">
+                1. Clean Handwriting Lines (3-Line Ruling)
+              </label>
+              <div class="sub-options">
+                <div class="sub-row">
+                  <span>Blank Lines Per Word:</span>
+                  <select id="opt-handwriting-lines" class="form-select" style="width: 110px;" onchange="updateConfig()">
+                    <option value="1">1 Blank Line</option>
+                    <option value="2" selected>2 Blank Lines</option>
+                    <option value="3">3 Blank Lines</option>
+                  </select>
+                </div>
+                <div class="sub-row">
+                  <span>Line Spacing:</span>
+                  <select id="opt-line-spacing" class="form-select" style="width: 110px;" onchange="updateConfig()">
+                    <option value="compact">Compact</option>
+                    <option value="normal" selected>Standard</option>
+                    <option value="spacious">Spacious</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Module 2: Sentence Completion -->
+            <div class="form-checkbox-card">
+              <label class="checkbox-label">
+                <input type="checkbox" id="mod-sentences" checked onchange="updateConfig()">
+                2. Sentence Completion & Context
+              </label>
+            </div>
+
+            <!-- Module 3: Word Search -->
+            <div class="form-checkbox-card">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="mod-wordsearch" checked onchange="updateConfig()">
+                  3. Word Search Puzzle
+                </label>
+                <button class="btn btn-secondary btn-sm" onclick="regenerateWordSearch()">
+                  🔄 Reshuffle
+                </button>
+              </div>
+              <div class="sub-options">
+                <div class="sub-row">
+                  <span>Grid Dimension:</span>
+                  <select id="opt-grid-size" class="form-select" style="width: 110px;" onchange="regenerateWordSearch()">
+                    <option value="8">8 x 8</option>
+                    <option value="10" selected>10 x 10</option>
+                    <option value="12">12 x 12</option>
+                  </select>
+                </div>
+                <div class="sub-row">
+                  <span>Allow Diagonal Words:</span>
+                  <input type="checkbox" id="opt-diagonal" onchange="regenerateWordSearch()">
+                </div>
+              </div>
+            </div>
+
+            <!-- Optional Extra Activities -->
+            <div class="form-checkbox-card">
+              <span class="form-label" style="font-size: 10px; color: var(--color-slate-500);">Bonus Activities:</span>
+              <label class="checkbox-label">
+                <input type="checkbox" id="mod-scramble" onchange="updateConfig()">
+                4. Word Scramble (Letter Jumble)
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="mod-abc" onchange="updateConfig()">
+                5. Alphabetical Order (ABC Sort)
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB 4: PAGE SETUP & HEADERS -->
+        <div id="tab-pane-page-setup" class="tab-pane" style="display: none;">
+          <div class="form-group" style="gap: 12px;">
+            <div>
+              <label class="form-label">Worksheet Main Title:</label>
+              <input type="text" id="cfg-title" class="form-input" value="Spelling & Phonics Practice" oninput="updateConfig()">
+            </div>
+            <div>
+              <label class="form-label">Subtitle / Instructions:</label>
+              <input type="text" id="cfg-instructions" class="form-input" value="Complete each activity carefully on the lines provided." oninput="updateConfig()">
+            </div>
+            <div>
+              <label class="form-label">Grade / Unit Tag (Optional):</label>
+              <input type="text" id="cfg-grade-unit" class="form-input" placeholder="e.g. Grade 2 • Week 4" oninput="updateConfig()">
+            </div>
+
+            <div style="border-top: 1px solid var(--color-slate-200); padding-top: 10px;">
+              <label class="checkbox-label" style="background: var(--color-slate-50); padding: 8px; border-radius: 6px; border: 1px solid var(--color-slate-200);">
+                <input type="checkbox" id="cfg-standalone-pages" checked onchange="updateConfig()">
+                <div>
+                  <div>Standalone Page per Activity</div>
+                  <div style="font-size: 10px; color: var(--color-slate-500); font-weight: normal;">Each activity prints on its own clean sheet</div>
+                </div>
+              </label>
+            </div>
+
+            <div style="border-top: 1px solid var(--color-slate-200); padding-top: 10px;">
+              <span class="form-label">Student Header Elements:</span>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
+                <label class="checkbox-label"><input type="checkbox" id="cfg-inc-name" checked onchange="updateConfig()"> Name Line</label>
+                <label class="checkbox-label"><input type="checkbox" id="cfg-inc-date" checked onchange="updateConfig()"> Date Line</label>
+                <label class="checkbox-label"><input type="checkbox" id="cfg-inc-score" checked onchange="updateConfig()"> Score Box</label>
+                <label class="checkbox-label"><input type="checkbox" id="cfg-inc-answers" onchange="updateConfig()"> Answer Key Page</label>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--color-slate-200); padding-top: 10px;">
+              <span class="form-label">Typography & Border:</span>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
+                <div>
+                  <span style="font-size: 11px; color: var(--color-slate-600);">Paper Size:</span>
+                  <select id="cfg-paper-size" class="form-select" onchange="updateConfig()">
+                    <option value="a4" selected>A4 (International)</option>
+                    <option value="letter">US Letter</option>
+                  </select>
+                </div>
+                <div>
+                  <span style="font-size: 11px; color: var(--color-slate-600);">Font Style:</span>
+                  <select id="cfg-font-family" class="form-select" onchange="updateConfig()">
+                    <option value="lexend" selected>Lexend (Clean)</option>
+                    <option value="school">Comic Neue (School)</option>
+                    <option value="andika">Andika (Literacy)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sidebar Bottom Action -->
+      <div class="sidebar-footer">
+        <button class="btn btn-primary" onclick="window.print()" style="padding: 12px; font-size: 14px;">
+          🖨️ Print / Save PDF (A4 / Letter)
+        </button>
+      </div>
+    </aside>
+
+    <!-- RIGHT PREVIEW CANVAS -->
+    <section class="preview-viewport" id="preview-viewport">
+      <div class="preview-toolbar no-print">
+        <span>📄 Live Worksheet Preview</span>
+        <button class="btn btn-secondary btn-sm" onclick="toggleSolutionOverlay()">
+          <span id="solution-btn-text">👁️ Show Answer Overlay</span>
+        </button>
+      </div>
+
+      <!-- RENDERED SHEETS CONTAINER -->
+      <div id="sheets-container" style="display: flex; flex-direction: column; gap: 32px; align-items: center;">
+        <!-- Sheets dynamically rendered here -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- -------------------------------------------------------------
+       EMBEDDED VANILLA JAVASCRIPT APPLICATION LOGIC
+  ------------------------------------------------------------- -->
+  <script>
+    /* State Management */
+    let words = [
+      { id: '1', word: 'cat', customSentence: '' },
+      { id: '2', word: 'bed', customSentence: '' },
+      { id: '3', word: 'pig', customSentence: '' },
+      { id: '4', word: 'sun', customSentence: '' },
+      { id: '5', word: 'hat', customSentence: '' },
+      { id: '6', word: 'dog', customSentence: '' }
+    ];
+
+    let wordSearchData = {
+      grid: [],
+      size: 10,
+      placedWords: []
+    };
+
+    let showSolutionOverlay = false;
+
+    // Default context sentences dictionary
+    const DEFAULT_SENTENCE_BANK = {
+      cat: "The fluffy ______ sat on the soft rug.",
+      bed: "I go to ______ when it is time to sleep.",
+      pig: "The pink ______ played happily in the mud.",
+      sun: "The bright yellow ______ shines warm in the sky.",
+      hat: "He put on a warm ______ before going outside.",
+      dog: "The friendly ______ wagged its tail happily.",
+      fox: "The clever red ______ ran quickly into the woods.",
+      pen: "I used a blue ______ to write my spelling words.",
+      cup: "She drank a warm ______ of hot cocoa.",
+      map: "We used a treasure ______ to find our way."
+    };
+
+    function getDefaultSentence(word) {
+      const lower = word.toLowerCase().trim();
+      if (DEFAULT_SENTENCE_BANK[lower]) {
+        return DEFAULT_SENTENCE_BANK[lower];
+      }
+      return `The student practiced spelling the word "______" today.`;
+    }
+
+    /* Word Search Generator Algorithm */
+    function generateWordSearchGrid(wordList, size = 10, allowDiagonal = false) {
+      const grid = Array.from({ length: size }, () => Array(size).fill(''));
+      const placedWords = [];
+
+      // Directions: [dRow, dCol]
+      let directions = [
+        [0, 1],   // Horizontal Left-to-Right
+        [1, 0],   // Vertical Top-to-Bottom
+      ];
+      if (allowDiagonal) {
+        directions.push([1, 1], [-1, 1]); // Diagonals
+      }
+
+      const sorted = [...wordList].sort((a, b) => b.length - a.length);
+
+      for (const w of sorted) {
+        const cleanWord = w.toUpperCase().replace(/[^A-Z]/g, '');
+        if (cleanWord.length > size) continue;
+
+        let placed = false;
+        let attempts = 0;
+
+        while (!placed && attempts < 100) {
+          attempts++;
+          const dir = directions[Math.floor(Math.random() * directions.length)];
+          const [dr, dc] = dir;
+
+          let startRow = Math.floor(Math.random() * size);
+          let startCol = Math.floor(Math.random() * size);
+
+          // Check boundary
+          const endRow = startRow + dr * (cleanWord.length - 1);
+          const endCol = startCol + dc * (cleanWord.length - 1);
+
+          if (endRow < 0 || endRow >= size || endCol < 0 || endCol >= size) {
+            continue;
+          }
+
+          // Check collisions
+          let fits = true;
+          for (let i = 0; i < cleanWord.length; i++) {
+            const r = startRow + dr * i;
+            const c = startCol + dc * i;
+            if (grid[r][c] !== '' && grid[r][c] !== cleanWord[i]) {
+              fits = false;
+              break;
+            }
+          }
+
+          if (fits) {
+            const coords = [];
+            for (let i = 0; i < cleanWord.length; i++) {
+              const r = startRow + dr * i;
+              const c = startCol + dc * i;
+              grid[r][c] = cleanWord[i];
+              coords.push([r, c]);
+            }
+            placedWords.push({ word: cleanWord, coords });
+            placed = true;
+          }
+        }
+      }
+
+      // Fill remaining empty cells with random letters
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (grid[r][c] === '') {
+            grid[r][c] = letters[Math.floor(Math.random() * letters.length)];
+          }
+        }
+      }
+
+      return { grid, size, placedWords };
+    }
+
+    /* Word Scramble Helper */
+    function scrambleWord(word) {
+      const arr = word.toUpperCase().split('');
+      if (arr.length <= 1) return word.toUpperCase();
+      let scrambled = arr.slice();
+      let attempts = 0;
+      while (scrambled.join('') === arr.join('') && attempts < 10) {
+        attempts++;
+        for (let i = scrambled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [scrambled[i], scrambled[j]] = [scrambled[j], scrambled[i]];
+        }
+      }
+      return scrambled.join('');
+    }
+
+    /* Navigation Tab Switcher */
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
+
+      const targetPane = document.getElementById(`tab-pane-${tabId}`);
+      if (targetPane) targetPane.style.display = 'block';
+
+      // Find matching button
+      event.target.classList.add('active');
+    }
+
+    /* Word List Operations */
+    function addWordsFromInput() {
+      const input = document.getElementById('word-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const rawTokens = text.split(/[\n,]+/)
+        .map(w => w.trim().toLowerCase().replace(/[^a-z0-9-]/g, ''))
+        .filter(w => w.length > 0);
+
+      const existing = new Set(words.map(w => w.word.toLowerCase()));
+
+      rawTokens.forEach(token => {
+        if (!existing.has(token)) {
+          words.push({
+            id: 'w_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+            word: token,
+            customSentence: ''
+          });
+          existing.add(token);
+        }
+      });
+
+      input.value = '';
+      regenerateWordSearch();
+      renderApp();
+    }
+
+    function removeWord(id) {
+      words = words.filter(w => w.id !== id);
+      regenerateWordSearch();
+      renderApp();
+    }
+
+    function clearAllWords() {
+      words = [];
+      regenerateWordSearch();
+      renderApp();
+    }
+
+    function updateCustomSentence(id, value) {
+      const target = words.find(w => w.id === id);
+      if (target) {
+        target.customSentence = value;
+        renderWorksheet();
+      }
+    }
+
+    function regenerateWordSearch() {
+      const size = parseInt(document.getElementById('opt-grid-size')?.value || '10');
+      const diagonal = document.getElementById('opt-diagonal')?.checked || false;
+      const wordStrings = words.map(w => w.word);
+      wordSearchData = generateWordSearchGrid(wordStrings, size, diagonal);
+      renderWorksheet();
+    }
+
+    function toggleSolutionOverlay() {
+      showSolutionOverlay = !showSolutionOverlay;
+      document.getElementById('solution-btn-text').textContent = showSolutionOverlay ? '🙈 Hide Answer Overlay' : '👁️ Show Answer Overlay';
+      renderWorksheet();
+    }
+
+    function updateConfig() {
+      renderWorksheet();
+    }
+
+    /* RENDER APPLICATION CONTROLS & CHIPS */
+    function renderApp() {
+      // Update count
+      document.getElementById('tab-word-count').textContent = words.length;
+
+      // Render Word Chips
+      const chipsBox = document.getElementById('word-chips-container');
+      if (words.length === 0) {
+        chipsBox.innerHTML = '<span style="font-size: 11px; color: #94a3b8; font-style: italic;">No words yet. Type words above!</span>';
+      } else {
+        chipsBox.innerHTML = words.map((item, idx) => `
+          <span class="word-chip">
+            <span style="color: #94a3b8; font-size: 10px;">${idx + 1}.</span>
+            ${item.word}
+            <span class="chip-remove" onclick="removeWord('${item.id}')">&times;</span>
+          </span>
+        `).join('');
+      }
+
+      // Render Custom Sentences Inputs
+      const sentencesBox = document.getElementById('custom-sentences-list');
+      if (words.length === 0) {
+        sentencesBox.innerHTML = '<span style="font-size: 11px; color: #94a3b8;">Add spelling words first in the Words tab.</span>';
+      } else {
+        sentencesBox.innerHTML = words.map((item, idx) => {
+          const defaultText = getDefaultSentence(item.word);
+          return `
+            <div style="padding: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; color: #4338ca;">
+                ${idx + 1}. ${item.word}
+              </div>
+              <textarea
+                class="form-textarea"
+                rows="2"
+                placeholder="Default: '${defaultText}'"
+                oninput="updateCustomSentence('${item.id}', this.value)"
+              >${item.customSentence || ''}</textarea>
+            </div>
+          `;
+        }).join('');
+      }
+
+      renderWorksheet();
+    }
+
+    /* RENDER PRINTABLE WORKSHEET SHEETS */
+    function renderWorksheet() {
+      const container = document.getElementById('sheets-container');
+      if (!container) return;
+
+      const title = document.getElementById('cfg-title')?.value || 'Spelling & Phonics Practice';
+      const instructions = document.getElementById('cfg-instructions')?.value || '';
+      const gradeUnit = document.getElementById('cfg-grade-unit')?.value || '';
+      const standalonePages = document.getElementById('cfg-standalone-pages')?.checked ?? true;
+      const incName = document.getElementById('cfg-inc-name')?.checked ?? true;
+      const incDate = document.getElementById('cfg-inc-date')?.checked ?? true;
+      const incScore = document.getElementById('cfg-inc-score')?.checked ?? true;
+      const incAnswers = document.getElementById('cfg-inc-answers')?.checked ?? false;
+      const paperSize = document.getElementById('cfg-paper-size')?.value || 'a4';
+      const fontFamily = document.getElementById('cfg-font-family')?.value || 'lexend';
+
+      const modHandwriting = document.getElementById('mod-handwriting')?.checked ?? true;
+      const modSentences = document.getElementById('mod-sentences')?.checked ?? true;
+      const modWordSearch = document.getElementById('mod-wordsearch')?.checked ?? true;
+      const modScramble = document.getElementById('mod-scramble')?.checked ?? false;
+      const modAbc = document.getElementById('mod-abc')?.checked ?? false;
+
+      const handwritingLines = parseInt(document.getElementById('opt-handwriting-lines')?.value || '2');
+      const lineSpacing = document.getElementById('opt-line-spacing')?.value || 'normal';
+
+      if (words.length === 0) {
+        container.innerHTML = `
+          <div style="background: #ffffff; padding: 40px; border-radius: 12px; text-align: center; border: 1px solid #cbd5e1; max-width: 500px;">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">No Words in Worksheet</h3>
+            <p style="font-size: 12px; color: #64748b;">Please add some spelling words in the left panel to generate your printable worksheet.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Build active modules list
+      const activePages = [];
+
+      if (modHandwriting) {
+        activePages.push({
+          id: 'handwriting',
+          title: 'Handwriting Practice',
+          render: () => `
+            <div class="module-header">
+              <div class="module-title-left">
+                <span class="module-badge">1</span>
+                <h2 class="module-heading">Handwriting Practice</h2>
+              </div>
+              <span class="module-hint">Write each word neatly on the clean practice lines</span>
+            </div>
+            <div class="handwriting-grid">
+              ${words.map((item, idx) => `
+                <div class="handwriting-item avoid-break-inside">
+                  <div class="word-prompt">
+                    <span class="num">${idx + 1}.</span>
+                    <span>${item.word}</span>
+                  </div>
+                  ${Array.from({ length: handwritingLines }).map(() => `
+                    <div class="ruled-line-box spacing-${lineSpacing}">
+                      <div class="dashed-midline"></div>
+                    </div>
+                  `).join('')}
+                </div>
+              `).join('')}
+            </div>
+          `
+        });
+      }
+
+      if (modSentences) {
+        activePages.push({
+          id: 'sentences',
+          title: 'Sentence Completion & Context',
+          render: () => `
+            <div class="module-header">
+              <div class="module-title-left">
+                <span class="module-badge">2</span>
+                <h2 class="module-heading">Sentence Completion & Context</h2>
+              </div>
+              <span class="module-hint">Fill in each blank with the correct spelling word</span>
+            </div>
+            <div class="word-bank-container avoid-break-inside">
+              <span class="word-bank-label">Word Bank:</span>
+              ${words.map(item => `
+                <span class="bank-word-card">
+                  <span class="checkbox-square"></span>
+                  <span>${item.word}</span>
+                </span>
+              `).join('')}
+            </div>
+            <div class="sentence-list">
+              ${words.map((item, idx) => {
+                let sentence = item.customSentence?.trim() || getDefaultSentence(item.word);
+                // Replace blank or word with blank line
+                let rendered = '';
+                if (sentence.includes('______')) {
+                  rendered = sentence.split('______').join('<span class="write-blank-line"></span>');
+                } else {
+                  const reg = new RegExp(`\\b${item.word}\\b`, 'gi');
+                  rendered = sentence.replace(reg, '<span class="write-blank-line"></span>');
+                }
+                return `
+                  <div class="sentence-row avoid-break-inside">
+                    <span class="sentence-num">${idx + 1}.</span>
+                    <div>${rendered}</div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `
+        });
+      }
+
+      if (modWordSearch && wordSearchData.grid.length > 0) {
+        const solutionCoords = new Set();
+        if (showSolutionOverlay) {
+          wordSearchData.placedWords.forEach(pw => {
+            pw.coords.forEach(([r, c]) => solutionCoords.add(`${r}-${c}`));
+          });
+        }
+
+        activePages.push({
+          id: 'wordsearch',
+          title: 'Word Search Puzzle',
+          render: () => `
+            <div class="module-header">
+              <div class="module-title-left">
+                <span class="module-badge">3</span>
+                <h2 class="module-heading">Word Search Puzzle</h2>
+              </div>
+              <span class="module-hint">Find and circle all hidden spelling words</span>
+            </div>
+            <div class="word-search-layout avoid-break-inside">
+              <div class="grid-container" style="grid-template-columns: repeat(${wordSearchData.size}, 32px);">
+                ${wordSearchData.grid.map((row, rIdx) =>
+                  row.map((cell, cIdx) => {
+                    const isSol = solutionCoords.has(`${rIdx}-${cIdx}`);
+                    return `<div class="grid-cell ${isSol ? 'highlight-solution' : ''}">${cell}</div>`;
+                  }).join('')
+                ).join('')}
+              </div>
+              <div class="checklist-container">
+                <div class="checklist-heading">Words to Find (${wordSearchData.placedWords.length}):</div>
+                <div class="checklist-grid">
+                  ${wordSearchData.placedWords.map(pw => `
+                    <span class="bank-word-card">
+                      <span class="checkbox-square"></span>
+                      <span>${pw.word}</span>
+                    </span>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          `
+        });
+      }
+
+      if (modScramble) {
+        activePages.push({
+          id: 'scramble',
+          title: 'Word Scramble',
+          render: () => `
+            <div class="module-header">
+              <div class="module-title-left">
+                <span class="module-badge">4</span>
+                <h2 class="module-heading">Word Scramble</h2>
+              </div>
+              <span class="module-hint">Unscramble the letters to spell each word correctly</span>
+            </div>
+            <div class="scramble-grid">
+              ${words.map((item, idx) => {
+                const scrambled = scrambleWord(item.word);
+                return `
+                  <div class="scramble-card avoid-break-inside">
+                    <div class="letter-badge-row">
+                      <span style="font-size: 11px; font-weight: 700; color: #64748b; margin-right: 4px;">${idx + 1}.</span>
+                      ${scrambled.split('').map(l => `<span class="scramble-letter-badge">${l}</span>`).join('')}
+                    </div>
+                    <div class="scramble-boxes">
+                      <span style="color: #94a3b8; font-weight: 700; margin-right: 4px;">➔</span>
+                      ${Array.from({ length: item.word.length }).map(() => `<span class="scramble-blank-box"></span>`).join('')}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `
+        });
+      }
+
+      if (modAbc) {
+        activePages.push({
+          id: 'abc',
+          title: 'Alphabetical Order',
+          render: () => `
+            <div class="module-header">
+              <div class="module-title-left">
+                <span class="module-badge">5</span>
+                <h2 class="module-heading">Alphabetical Order (ABC Sort)</h2>
+              </div>
+              <span class="module-hint">Write the spelling words in alphabetical order from A to Z</span>
+            </div>
+            <div class="abc-sort-grid">
+              ${words.map((_, idx) => `
+                <div class="abc-sort-row avoid-break-inside">
+                  <span class="num">${idx + 1}.</span>
+                  <span class="ruled-bottom"></span>
+                </div>
+              `).join('')}
+            </div>
+          `
+        });
+      }
+
+      const totalPages = activePages.length;
+
+      // Render standalone multi-page layout
+      if (standalonePages) {
+        let html = '';
+        activePages.forEach((page, pageIdx) => {
+          html += `
+            <article class="worksheet-sheet font-${fontFamily} ${paperSize === 'letter' ? 'letter-size' : ''} border-classic">
+              <div>
+                <!-- Header -->
+                <header class="sheet-header avoid-break-inside">
+                  <div class="student-meta-bar">
+                    <div class="meta-left">
+                      ${incName ? `<div><strong>Name:</strong> <span class="meta-line name-line"></span></div>` : ''}
+                      ${incDate ? `<div><strong>Date:</strong> <span class="meta-line date-line"></span></div>` : ''}
+                      ${gradeUnit ? `<div class="grade-badge">${gradeUnit}</div>` : ''}
+                    </div>
+                    <div class="meta-right">
+                      ${totalPages > 1 ? `<span class="page-indicator">Page ${pageIdx + 1} of ${totalPages}</span>` : ''}
+                      ${incScore ? `<div class="score-badge"><span>Score:</span> <span class="meta-line" style="min-width: 30px;"></span> <span>/ 10</span></div>` : ''}
+                    </div>
+                  </div>
+                  <div class="sheet-title-box">
+                    <h1 class="sheet-main-title">${title}</h1>
+                    ${instructions ? `<p class="sheet-instructions">${instructions}</p>` : ''}
+                  </div>
+                </header>
+
+                <!-- Activity Module Content -->
+                <div style="margin-top: 10px;">
+                  ${page.render()}
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <footer class="sheet-footer avoid-break-inside">
+                <span>🌟 Practice Makes Progress!</span>
+                <span>${title} • Page ${pageIdx + 1} of ${totalPages}</span>
+              </footer>
+            </article>
+          `;
+        });
+
+        // Optional Answer Key Page
+        if (incAnswers) {
+          const sorted = [...words].sort((a, b) => a.word.localeCompare(b.word));
+          html += `
+            <article class="worksheet-sheet font-${fontFamily} ${paperSize === 'letter' ? 'letter-size' : ''} border-classic">
+              <div>
+                <header class="sheet-header avoid-break-inside">
+                  <div style="text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px;">
+                    <span style="display: inline-block; padding: 2px 10px; background: #0f172a; color: #fff; font-size: 11px; font-weight: 700; border-radius: 4px; text-transform: uppercase; margin-bottom: 6px;">Teacher Edition</span>
+                    <h1 class="sheet-main-title">${title} — Solutions</h1>
+                  </div>
+                </header>
+
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                  <div style="padding: 16px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+                    <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Master Word List:</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                      ${words.map((item, idx) => `
+                        <span class="bank-word-card"><strong>${idx + 1}.</strong> ${item.word}</span>
+                      `).join('')}
+                    </div>
+                  </div>
+
+                  ${modAbc ? `
+                    <div style="padding: 16px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+                      <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Alphabetical Sort Solution:</h3>
+                      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                        ${sorted.map((item, idx) => `<div>${idx + 1}. ${item.word}</div>`).join('')}
+                      </div>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+
+              <footer class="sheet-footer avoid-break-inside">
+                <span>Teacher Answer Key & Solutions</span>
+                <span>${title}</span>
+              </footer>
+            </article>
+          `;
+        }
+
+        container.innerHTML = html;
+      } else {
+        // Continuous single sheet layout
+        container.innerHTML = `
+          <article class="worksheet-sheet font-${fontFamily} ${paperSize === 'letter' ? 'letter-size' : ''} border-classic">
+            <div>
+              <header class="sheet-header avoid-break-inside">
+                <div class="student-meta-bar">
+                  <div class="meta-left">
+                    ${incName ? `<div><strong>Name:</strong> <span class="meta-line name-line"></span></div>` : ''}
+                    ${incDate ? `<div><strong>Date:</strong> <span class="meta-line date-line"></span></div>` : ''}
+                    ${gradeUnit ? `<div class="grade-badge">${gradeUnit}</div>` : ''}
+                  </div>
+                  <div class="meta-right">
+                    ${incScore ? `<div class="score-badge"><span>Score:</span> <span class="meta-line" style="min-width: 30px;"></span> <span>/ 10</span></div>` : ''}
+                  </div>
+                </div>
+                <div class="sheet-title-box">
+                  <h1 class="sheet-main-title">${title}</h1>
+                  ${instructions ? `<p class="sheet-instructions">${instructions}</p>` : ''}
+                </div>
+              </header>
+
+              <div style="display: flex; flex-direction: column; gap: 24px;">
+                ${activePages.map(p => p.render()).join('')}
+              </div>
+            </div>
+
+            <footer class="sheet-footer avoid-break-inside">
+              <span>🌟 Practice Makes Progress!</span>
+              <span>${title}</span>
+            </footer>
+          </article>
+        `;
+      }
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      regenerateWordSearch();
+      renderApp();
+    });
+  </script>
+</body>
+</html>
