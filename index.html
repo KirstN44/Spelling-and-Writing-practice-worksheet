@@ -1639,7 +1639,9 @@
         sheet.style.transform = `scale(${zoomLevel / 100})`;
       });
     }
-
+    function getDefaultSentence(word) {
+  return `Write a sentence using the word ${word}.`;
+}
     function addWordsFromInput(replaceMode = false) {
       const input = document.getElementById('input-words');
       if (!input) return;
