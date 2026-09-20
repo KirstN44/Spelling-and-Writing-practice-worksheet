@@ -1388,10 +1388,17 @@
         if (trimmed.includes('______')) {
           return trimmed;
         }
+        if (/_{3,}/.test(trimmed)) {
+          return trimmed.replace(/_{3,}/g, '______');
+        }
         const escaped = escapeRegExp(word.trim());
         const regex = new RegExp(`\\b${escaped}\\b`, 'i');
         if (regex.test(trimmed)) {
           return trimmed.replace(regex, '______');
+        }
+        const inflected = new RegExp(`\\b${escaped}(?:s|es|ed|ing|d|er|est)?\\b`, 'i');
+        if (inflected.test(trimmed)) {
+          return trimmed.replace(inflected, '______');
         }
         return `${trimmed} ______`;
       }
