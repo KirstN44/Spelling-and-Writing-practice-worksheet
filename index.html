@@ -1125,16 +1125,19 @@
         <div id="tab-pane-words" class="tab-pane">
           <div class="form-group">
             <label class="form-label">Type or Paste Word List:</label>
-            <p class="form-help">Enter words separated by commas, spaces, or new lines.</p>
-            <textarea id="input-words" class="form-textarea" rows="4" placeholder="e.g. cat, bed, pig, sun, hat, dog"></textarea>
-            <div style="display: flex; gap: 8px; margin-top: 4px;">
-              <button class="btn btn-primary btn-sm" onclick="addWordsFromInput()">+ Add Words</button>
+            <p class="form-help">Enter words separated by commas, spaces, or new lines. Press Enter or click below.</p>
+            <textarea id="input-words" class="form-textarea" rows="4" placeholder="e.g. cat, bed, pig, sun, hat, dog" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); addWordsFromInput(false); }"></textarea>
+            <div style="display: flex; gap: 6px; margin-top: 6px;">
+              <button class="btn btn-primary btn-sm" onclick="addWordsFromInput(false)">+ Add Words</button>
+              <button class="btn btn-secondary btn-sm" onclick="addWordsFromInput(true)" title="Replace the active list with these new words">⚡ Replace List</button>
               <button class="btn btn-secondary btn-sm" onclick="clearAllWords()">Clear All</button>
             </div>
           </div>
 
           <div class="form-group" style="margin-top: 14px;">
-            <label class="form-label">Active Word List:</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0;">Active Word List (<span id="active-words-count">6</span>):</label>
+            </div>
             <div id="word-chips-container" class="word-chips-box"></div>
           </div>
         </div>
@@ -1637,26 +1640,53 @@
       });
     }
 
-    function addWordsFromInput() {
+    function addWordsFromInput(replaceMode = false) {
       const input = document.getElementById('input-words');
+      if (!input) return;
       const text = input.value.trim();
-      if (!text) return;
+      if (!text) {
+        input.focus();
+        input.style.boxShadow = '0 0 0 2px #ef4444';
+        setTimeout(() => { input.style.boxShadow = ''; }, 1000);
+        return;
+      }
 
-      const tokens = text.split(/[\n, ]+/).map(w => w.trim().toLowerCase().replace(/[^a-z0-9-]/g, '')).filter(w => w.length > 0);
+      // Split by commas, semicolons, newlines, or whitespace
+      const tokens = text
+        .split(/[\n,;\t]+/)
+        .flatMap(chunk => chunk.trim().split(/\s+/))
+        .map(w => w.trim().toLowerCase().replace(/[^a-z0-9'-]/g, ''))
+        .filter(w => w.length > 0);
+
+      if (tokens.length === 0) return;
+
+      if (replaceMode) {
+        words = [];
+      }
+
       const existing = new Set(words.map(w => w.word.toLowerCase()));
+      let added = 0;
 
       tokens.forEach(token => {
-        if (!existing.has(token)) {
+        if (!existing.has(token) || replaceMode) {
           words.push({
-            id: 'w_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+            id: 'w_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
             word: token,
             customSentence: getDefaultSentence(token)
           });
           existing.add(token);
+          added++;
         }
       });
 
       input.value = '';
+      
+      // Keep sentences textarea in sync if already populated
+      const sentencesInput = document.getElementById('input-sentences');
+      if (sentencesInput && sentencesInput.value.trim()) {
+        sentencesInput.value = words.map(w => w.customSentence || getDefaultSentence(w.word)).join('\n');
+      }
+
       regenerateWordSearch();
       renderApp();
     }
@@ -1789,8 +1819,11 @@
 
     /* RENDER APPLICATION CONTROLS & CHIPS */
     function renderApp() {
-      // Update count
-      document.getElementById('tab-word-count').textContent = words.length;
+      // Update count badges
+      const tabCount = document.getElementById('tab-word-count');
+      if (tabCount) tabCount.textContent = words.length;
+      const activeCount = document.getElementById('active-words-count');
+      if (activeCount) activeCount.textContent = words.length;
 
       // Render Word Chips
       const chipsBox = document.getElementById('word-chips-container');
