@@ -1097,6 +1097,9 @@
       </div>
     </div>
     <div class="header-actions">
+      <button class="btn btn-secondary" onclick="downloadStandaloneFile()" title="Save entire generator application as a single offline .html file">
+        📥 Save / Download .HTML App
+      </button>
       <button class="btn btn-primary" onclick="window.print()">
         🖨️ Print / Save PDF
       </button>
@@ -1140,10 +1143,13 @@
         <div id="tab-pane-sentences" class="tab-pane" style="display: none;">
           <div class="form-group">
             <label class="form-label">Type or Paste Sentences:</label>
-            <p class="form-help">Enter one sentence per line (matching your word list order). Use <code>______</code> for the blank line, or simply write the word directly.</p>
-            <textarea id="input-sentences" class="form-textarea" rows="6" placeholder="e.g.&#10;The cute ______ was sleeping on the mat.&#10;I go to ______ when it is bedtime.&#10;The pink ______ played happily in the mud." oninput="handleUnifiedSentencesInput()"></textarea>
-            <div style="display: flex; gap: 8px; margin-top: 4px;">
-              <button class="btn btn-secondary btn-sm" onclick="populateDefaultSentences()">✨ Auto-Fill Defaults</button>
+            <p class="form-help" style="background: #eef2ff; padding: 6px 8px; border-radius: 6px; border: 1px solid #e0e7ff; color: #3730a3;">
+              <strong>✨ Automatic Blanking:</strong> Write full sentences (e.g. <em>"The fluffy cat sat on the mat."</em>). The app automatically replaces <strong>cat</strong> with a blank line for the student sheet and keeps the full answer key!
+            </p>
+            <textarea id="input-sentences" class="form-textarea" rows="6" placeholder="e.g.&#10;The fluffy cat sat on the soft rug.&#10;It is time to sleep in my warm bed.&#10;The pink pig played in the mud." oninput="handleUnifiedSentencesInput()"></textarea>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 6px;">
+              <button class="btn btn-secondary btn-sm" onclick="populateDefaultSentences()">✨ Auto-Fill</button>
+              <button class="btn btn-secondary btn-sm" onclick="autoMatchSentences()" style="background: #ecfdf5; color: #065f46; border-color: #a7f3d0; font-weight: 700;">🪄 Auto-Match</button>
               <button class="btn btn-secondary btn-sm" onclick="clearAllSentences()">Clear</button>
             </div>
           </div>
@@ -2243,6 +2249,45 @@
           </article>
         `;
       }
+    }
+
+    function autoMatchSentences() {
+      const input = document.getElementById('input-sentences');
+      if (!input || !input.value.trim() || words.length === 0) return;
+      const rawLines = input.value
+        .split('\n')
+        .map(l => l.trim().replace(/^(\d+[\.\)]\s*|\[\d+\]\s*)/, ''))
+        .filter(l => l.length > 0);
+
+      const usedIndices = new Set();
+      words.forEach(w => {
+        const clean = w.word.trim();
+        const escaped = escapeRegExp(clean);
+        const regex = new RegExp(`\\b${escaped}(?:s|es|ed|ing)?\\b`, 'i');
+
+        const matchIdx = rawLines.findIndex((line, i) => !usedIndices.has(i) && regex.test(line));
+        if (matchIdx >= 0) {
+          usedIndices.add(matchIdx);
+          w.customSentence = rawLines[matchIdx];
+        }
+      });
+
+      input.value = words.map(w => w.customSentence || '').join('\n');
+      renderSentencesMappingPreview();
+      renderWorksheet();
+    }
+
+    function downloadStandaloneFile() {
+      const htmlContent = document.documentElement.outerHTML;
+      const blob = new Blob(['<!DOCTYPE html>\n' + htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Spelling-Worksheet-Generator-Standalone.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     // Initialize on load
