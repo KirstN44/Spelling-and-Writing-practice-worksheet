@@ -1,2260 +1,453 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spelling & Phonics Worksheet Generator</title>
-  <meta name="description" content="Customisable printable spelling and phonics worksheet generator with primary handwriting guidelines, fill-in-the-blank sentences, word search puzzles, and crisp print styling.">
-  
-  <!-- Google Fonts for Educational & Dyslexia-friendly Typography -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Comic+Neue:wght@400;700&family=Lexend:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <style>
-    /* -------------------------------------------------------------
-       GLOBAL RESETS & THEMED DESIGN SYSTEM (Vanilla CSS)
-    ------------------------------------------------------------- */
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    /* THEME PALETTES */
-    :root, body.theme-purple, [data-theme="purple"] {
-      --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      --font-lexend: 'Lexend', sans-serif;
-      --font-comic: 'Comic Neue', cursive, sans-serif;
-      --font-andika: 'Andika', sans-serif;
-      
-      --color-primary: #4f46e5;
-      --color-primary-hover: #4338ca;
-      --theme-accent: #6366f1;
-      --theme-badge-bg: #4f46e5;
-      --theme-badge-text: #ffffff;
-      --theme-card-bg: #faf8ff;
-      --theme-card-border: #e0e7ff;
-      --theme-header-border: #c7d2fe;
-      --theme-tint-subtle: #f5f3ff;
-      --theme-chip-bg: #ede9fe;
-      --theme-chip-text: #3730a3;
-      --theme-tag-bg: #e0e7ff;
-      --theme-tag-text: #3730a3;
-
-      --color-slate-900: #0f172a;
-      --color-slate-800: #1e293b;
-      --color-slate-700: #334155;
-      --color-slate-600: #475569;
-      --color-slate-500: #64748b;
-      --color-slate-400: #94a3b8;
-      --color-slate-300: #cbd5e1;
-      --color-slate-200: #e2e8f0;
-      --color-slate-100: #f1f5f9;
-      --color-slate-50: #f8fafc;
-      --color-amber-500: #f59e0b;
-      --color-emerald-600: #059669;
-      --color-rose-600: #e11d48;
-    }
-
-    body.theme-amber, [data-theme="amber"] {
-      --color-primary: #d97706;
-      --color-primary-hover: #b45309;
-      --theme-accent: #f59e0b;
-      --theme-badge-bg: #d97706;
-      --theme-badge-text: #ffffff;
-      --theme-card-bg: #fffdf5;
-      --theme-card-border: #fde68a;
-      --theme-header-border: #fcd34d;
-      --theme-tint-subtle: #fffbeb;
-      --theme-chip-bg: #fef3c7;
-      --theme-chip-text: #92400e;
-      --theme-tag-bg: #fef3c7;
-      --theme-tag-text: #92400e;
-    }
-
-    body.theme-sage, [data-theme="sage"] {
-      --color-primary: #059669;
-      --color-primary-hover: #047857;
-      --theme-accent: #10b981;
-      --theme-badge-bg: #059669;
-      --theme-badge-text: #ffffff;
-      --theme-card-bg: #f4fbf7;
-      --theme-card-border: #a7f3d0;
-      --theme-header-border: #6ee7b7;
-      --theme-tint-subtle: #ecfdf5;
-      --theme-chip-bg: #d1fae5;
-      --theme-chip-text: #065f46;
-      --theme-tag-bg: #d1fae5;
-      --theme-tag-text: #065f46;
-    }
-
-    body.theme-slate, [data-theme="slate"] {
-      --color-primary: #1e293b;
-      --color-primary-hover: #0f172a;
-      --theme-accent: #475569;
-      --theme-badge-bg: #0f172a;
-      --theme-badge-text: #ffffff;
-      --theme-card-bg: #f8fafc;
-      --theme-card-border: #cbd5e1;
-      --theme-header-border: #94a3b8;
-      --theme-tint-subtle: #f1f5f9;
-      --theme-chip-bg: #e2e8f0;
-      --theme-chip-text: #1e293b;
-      --theme-tag-bg: #e2e8f0;
-      --theme-tag-text: #1e293b;
-    }
-
-    body {
-      font-family: var(--font-main);
-      background-color: #f1f5f9;
-      color: var(--color-slate-900);
-      line-height: 1.5;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* -------------------------------------------------------------
-       TOP NAVIGATION BAR
-    ------------------------------------------------------------- */
-    .top-header {
-      background: #ffffff;
-      border-bottom: 1px solid var(--color-slate-200);
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-icon {
-      width: 36px;
-      height: 36px;
-      background: var(--color-primary);
-      color: #ffffff;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      transition: background-color 0.2s ease;
-    }
-
-    .brand-title {
-      font-family: var(--font-lexend);
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--color-slate-900);
-      line-height: 1.2;
-    }
-
-    .brand-subtitle {
-      font-size: 11px;
-      color: var(--color-slate-500);
-      font-weight: 500;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 8px 16px;
-      font-size: 13px;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: all 0.15s ease;
-      font-family: var(--font-main);
-    }
-
-    .btn-primary {
-      background: var(--color-primary);
-      color: #ffffff;
-    }
-    .btn-primary:hover { background: var(--color-primary-hover); }
-
-    .btn-secondary {
-      background: #ffffff;
-      border-color: var(--color-slate-300);
-      color: var(--color-slate-700);
-    }
-    .btn-secondary:hover {
-      background: var(--color-slate-50);
-      border-color: var(--color-slate-400);
-    }
-
-    .btn-sm {
-      padding: 5px 10px;
-      font-size: 11px;
-      border-radius: 6px;
-    }
-
-    /* -------------------------------------------------------------
-       MAIN TWO-COLUMN WORKSPACE
-    ------------------------------------------------------------- */
-    .app-workspace {
-      display: flex;
-      flex: 1;
-      height: calc(100vh - 61px);
-      overflow: hidden;
-    }
-
-    /* SIDEBAR CONTROL PANEL */
-    .control-sidebar {
-      width: 420px;
-      flex-shrink: 0;
-      background: #ffffff;
-      border-right: 1px solid var(--color-slate-200);
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .tabs-nav {
-      display: flex;
-      background: var(--color-slate-50);
-      border-bottom: 1px solid var(--color-slate-200);
-      padding: 6px 8px 0 8px;
-      overflow-x: auto;
-    }
-
-    .tab-btn {
-      padding: 8px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--color-slate-500);
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      border-radius: 6px 6px 0 0;
-      white-space: nowrap;
-      transition: all 0.15s ease;
-    }
-
-    .tab-btn.active {
-      color: var(--color-primary);
-      background: #ffffff;
-      border-bottom: 2px solid var(--color-primary);
-      box-shadow: 0 -1px 2px rgba(0,0,0,0.03);
-    }
-
-    .sidebar-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .sidebar-footer {
-      padding: 16px 20px;
-      background: var(--color-slate-50);
-      border-top: 1px solid var(--color-slate-200);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    /* FORM CONTROLS */
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-label {
-      font-family: var(--font-lexend);
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-slate-800);
-    }
-
-    .form-help {
-      font-size: 11px;
-      color: var(--color-slate-500);
-    }
-
-    .form-textarea, .form-input, .form-select {
-      width: 100%;
-      padding: 8px 12px;
-      font-size: 12px;
-      font-family: inherit;
-      border: 1px solid var(--color-slate-300);
-      border-radius: 8px;
-      background: #ffffff;
-      color: var(--color-slate-900);
-      outline: none;
-      transition: border-color 0.15s ease;
-    }
-
-    .form-textarea:focus, .form-input:focus, .form-select:focus {
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
-    }
-
-    .form-checkbox-card {
-      padding: 12px;
-      background: var(--color-slate-50);
-      border: 1px solid var(--color-slate-200);
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--color-slate-800);
-      cursor: pointer;
-    }
-
-    .sub-options {
-      padding-left: 24px;
-      border-top: 1px solid var(--color-slate-200);
-      padding-top: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-size: 12px;
-    }
-
-    .sub-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .word-chips-box {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding: 10px;
-      background: var(--color-slate-50);
-      border: 1px solid var(--color-slate-200);
-      border-radius: 10px;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
-    .word-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #ffffff;
-      border: 1px solid var(--color-slate-300);
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      font-family: var(--font-lexend);
-      color: var(--color-slate-800);
-    }
-
-    .word-chip .chip-remove {
-      color: var(--color-slate-400);
-      cursor: pointer;
-      font-size: 14px;
-      line-height: 1;
-    }
-    .word-chip .chip-remove:hover { color: var(--color-rose-600); }
-
-    /* PREVIEW VIEWPORT */
-    .preview-viewport {
-      flex: 1;
-      background: #e2e8f0;
-      overflow-y: auto;
-      padding: 32px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 32px;
-      position: relative;
-    }
-
-    .preview-toolbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(6px);
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 1px solid rgba(0,0,0,0.1);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--color-slate-700);
-    }
-
-    /* -------------------------------------------------------------
-       WORKSHEET SHEET CONTAINER (SCREEN & PRINT) - CANVA STYLE
-    ------------------------------------------------------------- */
-    .worksheet-sheet {
-      width: 210mm;
-      min-height: 297mm;
-      background: #ffffff;
-      padding: 24mm 18mm 18mm 18mm;
-      color: var(--color-slate-900);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-      transform-origin: top center;
-    }
-
-    .worksheet-sheet.letter-size {
-      width: 8.5in;
-      min-height: 11in;
-    }
-
-    .worksheet-sheet.border-classic {
-      border: 2px solid var(--color-slate-900);
-    }
-
-    .worksheet-sheet.border-dashed {
-      border: 2px dashed var(--color-slate-900);
-      border-radius: 12px;
-    }
-
-    .worksheet-sheet.border-none {
-      border: 1px solid transparent;
-    }
-
-    /* Font Family Overrides */
-    .font-lexend { font-family: var(--font-lexend); }
-    .font-school { font-family: var(--font-comic); }
-    .font-andika { font-family: var(--font-andika); }
-
-    /* WORKSHEET HEADER */
-    .sheet-header {
-      width: 100%;
-      margin-bottom: 16px;
-    }
-
-    .student-meta-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 2px solid var(--color-slate-900);
-      padding-bottom: 10px;
-      margin-bottom: 14px;
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .meta-left {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .meta-line {
-      display: inline-block;
-      border-bottom: 2px solid var(--color-slate-900);
-      height: 18px;
-      vertical-align: bottom;
-      margin-left: 6px;
-    }
-
-    .name-line { min-width: 160px; }
-    .date-line { min-width: 110px; }
-
-    .grade-badge {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 2px 8px;
-      background: var(--theme-tint-subtle);
-      border: 1px solid var(--theme-header-border);
-      border-radius: 4px;
-      color: var(--color-slate-800);
-    }
-
-    .meta-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .page-indicator {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--color-slate-600);
-    }
-
-    .score-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      border: 2px solid var(--color-slate-900);
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .sheet-title-box {
-      text-align: center;
-      margin-bottom: 16px;
-    }
-
-    .sheet-main-title {
-      font-size: 22px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--color-slate-900);
-    }
-
-    .sheet-sub-title {
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--color-slate-700);
-      margin-top: 4px;
-    }
-
-    .sheet-instructions {
-      font-size: 11px;
-      color: var(--color-slate-600);
-      font-style: italic;
-      margin-top: 4px;
-      max-width: 540px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* -------------------------------------------------------------
-       CANVA-INSPIRED ACTIVITY CARD CONTAINERS & SECTION HEADERS
-    ------------------------------------------------------------- */
-    .activity-card-container {
-      background-color: var(--theme-card-bg);
-      border: 1.5px solid var(--theme-card-border);
-      border-radius: 12px;
-      padding: 16px 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
-    }
-
-    .module-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 2px solid var(--theme-header-border);
-      padding-bottom: 8px;
-      margin-bottom: 14px;
-    }
-
-    .module-title-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .module-badge {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--theme-badge-bg);
-      color: var(--theme-badge-text);
-      font-size: 11px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-
-    .module-heading {
-      font-size: 14px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-slate-900);
-    }
-
-    .module-hint {
-      font-size: 11px;
-      font-style: italic;
-      color: var(--color-slate-600);
-    }
-
-    /* -------------------------------------------------------------
-       ACTIVITY 1: HANDWRITING LINES (CLEAN 3-LINE PRIMARY RULING)
-    ------------------------------------------------------------- */
-    .handwriting-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px 20px;
-    }
-
-    .handwriting-item {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .word-prompt {
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-slate-900);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 2px;
-    }
-
-    .word-prompt .num {
-      color: var(--color-slate-500);
-      font-size: 11px;
-    }
-
-    /* Clean 3-Line Primary Ruling */
-    .ruled-line-box {
-      width: 100%;
-      position: relative;
-      background: #ffffff;
-      border-top: 2px solid var(--color-slate-900);
-      border-bottom: 2px solid var(--color-slate-900);
-      margin-bottom: 4px;
-    }
-
-    .ruled-line-box.spacing-compact { height: 40px; }
-    .ruled-line-box.spacing-normal { height: 48px; }
-    .ruled-line-box.spacing-spacious { height: 56px; }
-
-    .ruled-line-box .dashed-midline {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      border-top: 2px dashed #94a3b8;
-      pointer-events: none;
-    }
-
-    /* -------------------------------------------------------------
-       ACTIVITY 2: SENTENCE COMPLETION & CONTEXT
-    ------------------------------------------------------------- */
-    .word-bank-container {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
-      background: #ffffff;
-      border: 1.5px dashed var(--theme-header-border);
-      padding: 10px 14px;
-      border-radius: 8px;
-      margin-bottom: 14px;
-    }
-
-    .word-bank-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-slate-700);
-      margin-right: 4px;
-    }
-
-    .bank-word-card {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--theme-tint-subtle);
-      border: 1px solid var(--theme-card-border);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-slate-900);
-    }
-
-    .bank-word-card .checkbox-square {
-      width: 12px;
-      height: 12px;
-      border: 1.5px solid var(--color-slate-500);
-      border-radius: 2px;
-      display: inline-block;
-      background: #ffffff;
-    }
-
-    .sentence-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .sentence-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .sentence-num {
-      font-weight: 700;
-      color: var(--color-slate-700);
-      min-width: 18px;
-    }
-
-    .write-blank-line {
-      display: inline-block;
-      border-bottom: 2px solid var(--color-slate-900);
-      min-width: 100px;
-      margin: 0 4px;
-      vertical-align: bottom;
-      height: 16px;
-    }
-
-    /* -------------------------------------------------------------
-       ACTIVITY 3: WORD SEARCH PUZZLE
-    ------------------------------------------------------------- */
-    .word-search-layout {
-      display: flex;
-      gap: 24px;
-      align-items: flex-start;
-      justify-content: center;
-    }
-
-    .grid-container {
-      display: grid;
-      gap: 2px;
-      background: var(--color-slate-900);
-      padding: 2px;
-      border: 2px solid var(--color-slate-900);
-      border-radius: 8px;
-    }
-
-    .grid-cell {
-      width: 32px;
-      height: 32px;
-      background: #ffffff;
-      color: var(--color-slate-900);
-      font-size: 14px;
-      font-weight: 700;
-      font-family: var(--font-lexend);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-transform: uppercase;
-      user-select: none;
-    }
-
-    .grid-cell.highlight-solution {
-      background: #fef08a !important;
-      color: #000000 !important;
-      font-weight: 900;
-    }
-
-    .checklist-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .checklist-heading {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-slate-700);
-    }
-
-    .checklist-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-
-    /* -------------------------------------------------------------
-       ACTIVITY 4: MISSING LETTERS (FILL-IN-THE-BLANKS)
-    ------------------------------------------------------------- */
-    .missing-letters-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
-    .missing-card {
-      padding: 12px 14px;
-      background: #ffffff;
-      border: 1px solid var(--theme-card-border);
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-    }
-
-    .missing-card-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .missing-card-num {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--color-slate-800);
-    }
-
-    .missing-card-badge {
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      padding: 2px 6px;
-      background: var(--theme-tint-subtle);
-      border-radius: 4px;
-      color: var(--color-slate-600);
-    }
-
-    .missing-letter-tiles {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 4px 0;
-    }
-
-    .letter-tile {
-      width: 38px;
-      height: 44px;
-      background: #ffffff;
-      border: 2px solid var(--color-slate-900);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: 800;
-      text-transform: uppercase;
-      font-family: var(--font-lexend);
-      color: var(--color-slate-900);
-    }
-
-    .letter-tile.blank-tile {
-      background: var(--theme-tint-subtle);
-      border: 2px dashed var(--color-slate-900);
-      color: transparent;
-    }
-
-    .letter-tile.blank-tile.show-solution {
-      background: #fef08a !important;
-      color: #854d0e !important;
-      border: 2px solid #ca8a04 !important;
-    }
-
-    .missing-write-line-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding-top: 6px;
-      border-top: 1px solid var(--color-slate-200);
-    }
-
-    .missing-write-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--color-slate-600);
-      white-space: nowrap;
-    }
-
-    .missing-write-line {
-      flex: 1;
-      height: 26px;
-      border-bottom: 2px solid var(--color-slate-900);
-      background: rgba(0,0,0,0.02);
-      position: relative;
-      display: flex;
-      align-items: center;
-      padding: 0 8px;
-    }
-
-    .missing-write-line .midline {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      border-top: 1.5px dashed #94a3b8;
-      pointer-events: none;
-    }
-
-    /* -------------------------------------------------------------
-       ACTIVITY 5: WORD SCRAMBLE
-    ------------------------------------------------------------- */
-    .scramble-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .scramble-card {
-      padding: 8px 12px;
-      background: #ffffff;
-      border: 1px solid var(--theme-card-border);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .letter-badge-row {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-    }
-
-    .scramble-letter-badge {
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--theme-tint-subtle);
-      border: 1px solid var(--theme-card-border);
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .scramble-boxes {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-    }
-
-    .scramble-blank-box {
-      width: 22px;
-      height: 22px;
-      border: 1.5px solid var(--color-slate-800);
-      border-radius: 4px;
-      background: #ffffff;
-    }
-
-    /* -------------------------------------------------------------
-       ACTIVITY 6: ALPHABETICAL ORDER
-    ------------------------------------------------------------- */
-    .abc-sort-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px 24px;
-    }
-
-    .abc-sort-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .abc-sort-row .num {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--color-slate-600);
-      min-width: 18px;
-    }
-
-    .abc-sort-row .ruled-bottom {
-      flex: 1;
-      border-bottom: 2px solid var(--color-slate-900);
-      height: 24px;
-    }
-
-    /* WORKSHEET FOOTER */
-    .sheet-footer {
-      border-top: 1px solid var(--color-slate-300);
-      padding-top: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 10px;
-      color: var(--color-slate-500);
-      font-weight: 600;
-      margin-top: 16px;
-    }
-
-    /* -------------------------------------------------------------
-       PRINT MEDIA QUERIES (CLEAN A4 / LETTER BLACK & WHITE EXPORT)
-    ------------------------------------------------------------- */
-    @media print {
-      @page {
-        size: auto;
-        margin: 8mm 10mm 8mm 10mm;
-      }
-
-      html, body {
-        background: #ffffff !important;
-        color: #000000 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        font-size: 11pt !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-
-      .no-print, .top-header, .control-sidebar, .preview-toolbar {
-        display: none !important;
-      }
-
-      .app-workspace {
-        display: block !important;
-        height: auto !important;
-        overflow: visible !important;
-      }
-
-      .preview-viewport {
-        background: transparent !important;
-        padding: 0 !important;
-        gap: 0 !important;
-        overflow: visible !important;
-        display: block !important;
-      }
-
-      .worksheet-sheet {
-        width: 100% !important;
-        min-height: auto !important;
-        box-shadow: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: none !important;
-        page-break-after: always !important;
-        break-after: page !important;
-      }
-
-      .worksheet-sheet:last-child {
-        page-break-after: auto !important;
-        break-after: auto !important;
-      }
-
-      .activity-card-container {
-        box-shadow: none !important;
-      }
-
-      .avoid-break-inside {
-        break-inside: avoid !important;
-        page-break-inside: avoid !important;
-      }
-
-      * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling & Phonics Worksheet Generator</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            background: #fef08a;
+            padding: 6px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        p.subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-color);
+        }
+
+        /* Main Workspace Layout */
+        .workspace {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Panel */
+        sidebar {
+            width: 360px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            gap: 16px;
+            overflow-y: auto;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .tab {
+            cursor: pointer;
+            padding-bottom: 2px;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            font-weight: 600;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: var(--text-muted);
+        }
+
+        .helper-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 0.9rem;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .button-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Active Word List Box */
+        .active-list-container {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-color);
+            min-height: 80px;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-content: flex-start;
+        }
+
+        .word-tag {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .word-tag .remove-btn {
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .word-tag .remove-btn:hover {
+            color: #ef4444;
+        }
+
+        .empty-notice {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-style: italic;
+            margin: auto;
+        }
+
+        /* Right Preview Pane */
+        main.preview-pane {
+            flex: 1;
+            background: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .preview-toolbar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+
+        .zoom-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 2px 6px;
+            color: var(--text-main);
+        }
+
+        .zoom-btn:hover {
+            background: var(--bg-color);
+            border-radius: 4px;
+        }
+
+        .paper-canvas {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            min-height: 500px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .paper-empty-state h3 {
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .paper-empty-state p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+    </style>
 </head>
-<body class="theme-purple">
+<body>
 
-  <!-- TOP HEADER -->
-  <header class="top-header no-print">
-    <div class="header-brand">
-      <div class="brand-icon">✏️</div>
-      <div>
-        <h1 class="brand-title">Spelling & Phonics Worksheet Generator</h1>
-        <p class="brand-subtitle">Interactive printable primary school worksheets with 3-line ruling & word search</p>
-      </div>
-    </div>
-    <div class="header-actions">
-      <button class="btn btn-primary" onclick="window.print()">
-        🖨️ Print / Save PDF
-      </button>
-    </div>
-  </header>
+    <!-- Top Header -->
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">✏️</div>
+            <div>
+                <h1>Spelling & Phonics Worksheet Generator</h1>
+                <p class="subtitle">interactive printable primary school worksheets with 3-line ruling & word search</p>
+            </div>
+        </div>
+        <button class="btn-primary">🖨️ Print / Save PDF</button>
+    </header>
 
-  <!-- MAIN WORKSPACE -->
-  <div class="app-workspace">
-    
-    <!-- LEFT SIDEBAR CONTROL PANEL -->
-    <aside class="control-sidebar no-print">
-      <!-- Tabs Navigation -->
-      <nav class="tabs-nav">
-        <button class="tab-btn active" onclick="switchTab('words', this)">Words (<span id="tab-word-count">6</span>)</button>
-        <button class="tab-btn" onclick="switchTab('sentences', this)">Sentences</button>
-        <button class="tab-btn" onclick="switchTab('activities', this)">Activities</button>
-        <button class="tab-btn" onclick="switchTab('page-setup', this)">Page Setup</button>
-      </nav>
-
-      <div class="sidebar-content">
+    <!-- App Body -->
+    <div class="workspace">
         
-        <!-- TAB 1: WORDS -->
-        <div id="tab-pane-words" class="tab-pane">
-          <div class="form-group">
-            <label class="form-label">Type or Paste Word List:</label>
-            <p class="form-help">Enter words separated by commas, spaces, or new lines.</p>
-            <textarea id="input-words" class="form-textarea" rows="4" placeholder="e.g. cat, bed, pig, sun, hat, dog"></textarea>
-            <div style="display: flex; gap: 8px; margin-top: 4px;">
-              <button class="btn btn-primary btn-sm" onclick="addWordsFromInput()">+ Add Words</button>
-              <button class="btn btn-secondary btn-sm" onclick="clearAllWords()">Clear All</button>
+        <!-- Left Configuration Panel -->
+        <sidebar>
+            <div class="tabs">
+                <div class="tab active">Words (<span id="word-count-badge">0</span>)</div>
+                <div class="tab">Sentences</div>
+                <div class="tab">Activities</div>
+                <div class="tab">Page Setup</div>
             </div>
-          </div>
 
-          <div class="form-group" style="margin-top: 14px;">
-            <label class="form-label">Active Word List:</label>
-            <div id="word-chips-container" class="word-chips-box"></div>
-          </div>
-        </div>
-
-        <!-- TAB 2: SENTENCES -->
-        <div id="tab-pane-sentences" class="tab-pane" style="display: none;">
-          <div class="form-group">
-            <label class="form-label">Type or Paste Sentences:</label>
-            <p class="form-help">Enter one sentence per line (matching your word list order). Use <code>______</code> for the blank line, or simply write the word directly.</p>
-            <textarea id="input-sentences" class="form-textarea" rows="6" placeholder="e.g.&#10;The cute ______ was sleeping on the mat.&#10;I go to ______ when it is bedtime.&#10;The pink ______ played happily in the mud." oninput="handleUnifiedSentencesInput()"></textarea>
-            <div style="display: flex; gap: 8px; margin-top: 4px;">
-              <button class="btn btn-secondary btn-sm" onclick="populateDefaultSentences()">✨ Auto-Fill Defaults</button>
-              <button class="btn btn-secondary btn-sm" onclick="clearAllSentences()">Clear</button>
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-top: 14px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <label class="form-label" style="margin-bottom: 0;">Word & Sentence Mapping:</label>
-              <span id="sentence-mapping-count" style="font-size: 11px; color: var(--color-slate-500); font-weight: 600;"></span>
-            </div>
-            <div id="sentences-mapping-preview" class="word-chips-box" style="display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto;"></div>
-          </div>
-        </div>
-
-        <!-- TAB 3: ACTIVITIES -->
-        <div id="tab-pane-activities" class="tab-pane" style="display: none;">
-          <div class="form-group" style="gap: 12px;">
-            
-            <!-- Module 1: Handwriting -->
-            <div class="form-checkbox-card">
-              <label class="checkbox-label">
-                <input type="checkbox" id="mod-handwriting" checked onchange="updateConfig()">
-                1. Clean Handwriting Lines (3-Line Ruling)
-              </label>
-              <div class="sub-options">
-                <div class="sub-row">
-                  <span>Blank Lines Per Word:</span>
-                  <select id="opt-handwriting-lines" class="form-select" style="width: 110px;" onchange="updateConfig()">
-                    <option value="1">1 Blank Line</option>
-                    <option value="2" selected>2 Blank Lines</option>
-                    <option value="3">3 Blank Lines</option>
-                  </select>
+            <div class="control-group">
+                <label for="word-input">Type or Paste Word List:</label>
+                <span class="helper-text">Enter words separated by commas, spaces, or newlines.</span>
+                <textarea id="word-input" placeholder="ball&#10;book&#10;tree&#10;frog&#10;hand">ball
+book
+tree
+frog
+hand</textarea>
+                
+                <div class="button-row">
+                    <button class="btn-primary" id="add-words-btn">+ Add Words</button>
+                    <button class="btn-secondary" id="clear-all-btn">Clear All</button>
                 </div>
-                <div class="sub-row">
-                  <span>Line Spacing:</span>
-                  <select id="opt-line-spacing" class="form-select" style="width: 110px;" onchange="updateConfig()">
-                    <option value="compact">Compact</option>
-                    <option value="normal" selected>Standard</option>
-                    <option value="spacious">Spacious</option>
-                  </select>
+            </div>
+
+            <div class="control-group">
+                <label>Active Word List:</label>
+                <div class="active-list-container" id="active-list-container">
+                    <span class="empty-notice" id="empty-notice">No words yet. Type words above!</span>
                 </div>
-              </div>
             </div>
+        </sidebar>
 
-            <!-- Module 2: Sentence Completion -->
-            <div class="form-checkbox-card">
-              <label class="checkbox-label">
-                <input type="checkbox" id="mod-sentences" checked onchange="updateConfig()">
-                2. Sentence Completion & Context
-              </label>
-            </div>
-
-            <!-- Module 3: Word Search -->
-            <div class="form-checkbox-card">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <label class="checkbox-label">
-                  <input type="checkbox" id="mod-wordsearch" checked onchange="updateConfig()">
-                  3. Word Search Puzzle
-                </label>
-                <button class="btn btn-secondary btn-sm" onclick="regenerateWordSearch()">
-                  🔄 Reshuffle
-                </button>
-              </div>
-              <div class="sub-options">
-                <div class="sub-row">
-                  <span>Grid Dimension:</span>
-                  <select id="opt-grid-size" class="form-select" style="width: 110px;" onchange="regenerateWordSearch()">
-                    <option value="8">8 x 8</option>
-                    <option value="10" selected>10 x 10</option>
-                    <option value="12">12 x 12</option>
-                  </select>
+        <!-- Right Live Preview Pane -->
+        <main class="preview-pane">
+            <div class="preview-toolbar">
+                <div class="zoom-controls">
+                    <span>Zoom:</span>
+                    <button class="zoom-btn" id="zoom-out">-</button>
+                    <span id="zoom-level">100%</span>
+                    <button class="zoom-btn" id="zoom-in">+</button>
                 </div>
-                <div class="sub-row">
-                  <span>Allow Diagonal Words:</span>
-                  <input type="checkbox" id="opt-diagonal" onchange="regenerateWordSearch()">
+                <button class="btn-secondary">👁️ Show Answer Overlay</button>
+            </div>
+
+            <div class="paper-canvas" id="paper-canvas">
+                <div class="paper-empty-state" id="paper-empty-state">
+                    <h3>No Words in Worksheet</h3>
+                    <p>Please add some spelling words in the left panel to generate your printable worksheet.</p>
                 </div>
-              </div>
             </div>
+        </main>
+    </div>
 
-            <!-- Module 4: Missing Letters -->
-            <div class="form-checkbox-card">
-              <label class="checkbox-label">
-                <input type="checkbox" id="mod-missingletters" checked onchange="updateConfig()">
-                4. Missing Letters (Fill-in-the-Blanks)
-              </label>
-              <div class="sub-options">
-                <div class="sub-row">
-                  <span>Missing Letter Focus:</span>
-                  <select id="opt-missing-pattern" class="form-select" style="width: 140px;" onchange="updateConfig()">
-                    <option value="smart" selected>Smart (Phonics Vowels & Blends)</option>
-                    <option value="vowels">Vowels Only (a, e, i, o, u)</option>
-                    <option value="first">First Letter (Initial)</option>
-                    <option value="random">Random 1-2 Letters</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+    <script>
+        // State Management
+        let activeWords = ["ball", "book", "tree", "frog", "hand"];
 
-            <!-- Optional Extra Activities -->
-            <div class="form-checkbox-card">
-              <span class="form-label" style="font-size: 10px; color: var(--color-slate-500);">Bonus Activities:</span>
-              <label class="checkbox-label">
-                <input type="checkbox" id="mod-scramble" onchange="updateConfig()">
-                5. Word Scramble (Letter Jumble)
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="mod-abc" onchange="updateConfig()">
-                6. Alphabetical Order (ABC Sort)
-              </label>
-            </div>
+        // DOM Elements
+        const wordInput = document.getElementById('word-input');
+        const addWordsBtn = document.getElementById('add-words-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const activeListContainer = document.getElementById('active-list-container');
+        const wordCountBadge = document.getElementById('word-count-badge');
+        const paperEmptyState = document.getElementById('paper-empty-state');
 
-          </div>
-        </div>
+        // Render function to update UI state
+        function render() {
+            // Update badge counter
+            wordCountBadge.textContent = activeWords.length;
 
-        <!-- TAB 4: PAGE SETUP & HEADERS -->
-        <div id="tab-pane-page-setup" class="tab-pane" style="display: none;">
-          <div class="form-group" style="gap: 12px;">
-            
-            <!-- THEME SWITCHER -->
-            <div>
-              <label class="form-label">Theme Palette:</label>
-              <select id="cfg-theme" class="form-select" onchange="updateThemeAndConfig()">
-                <option value="purple" selected>Playful Purple (Default)</option>
-                <option value="amber">Sunshine Amber</option>
-                <option value="sage">Forest Sage</option>
-                <option value="slate">Classic Slate (Ink-Saving / Monochrome)</option>
-              </select>
-            </div>
+            // Clear active list view container
+            activeListContainer.innerHTML = '';
 
-            <div>
-              <label class="form-label">Worksheet Main Title:</label>
-              <input type="text" id="cfg-title" class="form-input" value="Spelling & Phonics Practice" oninput="updateConfig()">
-            </div>
-            <div>
-              <label class="form-label">Subtitle / Instructions:</label>
-              <input type="text" id="cfg-instructions" class="form-input" value="Complete each activity carefully on the lines provided." oninput="updateConfig()">
-            </div>
-            <div>
-              <label class="form-label">Grade / Unit Tag (Optional):</label>
-              <input type="text" id="cfg-grade-unit" class="form-input" placeholder="e.g. Grade 2 • Week 4" oninput="updateConfig()">
-            </div>
-
-            <div style="border-top: 1px solid var(--color-slate-200); padding-top: 10px;">
-              <label class="checkbox-label" style="background: var(--color-slate-50); padding: 8px; border-radius: 6px; border: 1px solid var(--color-slate-200);">
-                <input type="checkbox" id="cfg-standalone-pages" checked onchange="updateConfig()">
-                <div>
-                  <div>Standalone Page per Activity</div>
-                  <div style="font-size: 10px; color: var(--color-slate-500); font-weight: normal;">Each activity prints on its own clean sheet</div>
-                </div>
-              </label>
-            </div>
-
-            <div style="border-top: 1px solid var(--color-slate-200); padding-top: 10px;">
-              <span class="form-label">Student Header Elements:</span>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
-                <label class="checkbox-label"><input type="checkbox" id="cfg-inc-name" checked onchange="updateConfig()"> Name Line</label>
-                <label class="checkbox-label"><input type="checkbox" id="cfg-inc-date" checked onchange="updateConfig()"> Date Line</label>
-                <label class="checkbox-label"><input type="checkbox" id="cfg-inc-score" checked onchange="updateConfig()"> Score Box</label>
-                <label class="checkbox-label"><input type="checkbox" id="cfg-inc-answers" onchange="updateConfig()"> Answer Key Page</label>
-              </div>
-            </div>
-
-            <div style="border-top: 1px solid var(--color-slate-200); padding-top: 10px;">
-              <span class="form-label">Typography & Border:</span>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
-                <div>
-                  <span style="font-size: 11px; color: var(--color-slate-600);">Paper Size:</span>
-                  <select id="cfg-paper-size" class="form-select" onchange="updateConfig()">
-                    <option value="a4" selected>A4 (International)</option>
-                    <option value="letter">US Letter</option>
-                  </select>
-                </div>
-                <div>
-                  <span style="font-size: 11px; color: var(--color-slate-600);">Font Style:</span>
-                  <select id="cfg-font-family" class="form-select" onchange="updateConfig()">
-                    <option value="lexend" selected>Lexend (Clean)</option>
-                    <option value="school">Comic Neue (School)</option>
-                    <option value="andika">Andika (Literacy)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Sidebar Bottom Action -->
-      <div class="sidebar-footer">
-        <button class="btn btn-primary" onclick="window.print()" style="padding: 12px; font-size: 14px;">
-          🖨️ Print / Save PDF (A4 / Letter)
-        </button>
-      </div>
-    </aside>
-
-    <!-- RIGHT PREVIEW CANVAS -->
-    <main class="preview-viewport">
-      <!-- Floating Toolbar for preview zoom & quick toggles -->
-      <div class="preview-toolbar no-print">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span>Zoom:</span>
-          <button class="btn btn-secondary btn-sm" onclick="adjustZoom(-10)">−</button>
-          <span id="zoom-value" style="min-width: 40px; text-align: center;">100%</span>
-          <button class="btn btn-secondary btn-sm" onclick="adjustZoom(10)">+</button>
-        </div>
-        <div style="height: 16px; width: 1px; background: #cbd5e1;"></div>
-        <button class="btn btn-secondary btn-sm" onclick="toggleSolutionOverlay()">
-          <span id="solution-btn-text">👁️ Show Answer Overlay</span>
-        </button>
-      </div>
-
-      <!-- Printable Sheets Container -->
-      <div id="sheets-container" style="display: flex; flex-direction: column; gap: 32px; align-items: center;"></div>
-    </main>
-
-  </div>
-
-  <!-- APPLICATION JAVASCRIPT LOGIC -->
-  <script>
-    /* APPLICATION STATE */
-    let words = [
-      { id: 'w1', word: 'cat', customSentence: 'The cute ______ was sleeping on the mat.' },
-      { id: 'w2', word: 'bed', customSentence: 'I go to ______ when it is bedtime.' },
-      { id: 'w3', word: 'pig', customSentence: 'The pink ______ played happily in the mud.' },
-      { id: 'w4', word: 'sun', customSentence: 'The bright ______ shines warmly in the sky.' },
-      { id: 'w5', word: 'hat', customSentence: 'Put on your sun ______ before going outside.' },
-      { id: 'w6', word: 'dog', customSentence: 'Our friendly ______ loves to chase the ball.' }
-    ];
-
-    let wordSearchData = { size: 10, grid: [], placedWords: [] };
-    let showSolutionOverlay = false;
-    let zoomLevel = 100;
-
-    /* DEFAULT SENTENCE FALLBACKS */
-    function getDefaultSentence(word) {
-      const w = word.toLowerCase();
-      const map = {
-        'cat': 'The cute ______ was sleeping on the mat.',
-        'dog': 'Our friendly ______ loves to chase the ball.',
-        'pig': 'The pink ______ played happily in the mud.',
-        'sun': 'The bright ______ shines warmly in the sky.',
-        'hat': 'Put on your sun ______ before going outside.',
-        'bed': 'I go to ______ when it is bedtime.',
-        'ball': 'Kick the ______ across the green grass.',
-        'book': 'Please open your reading ______ to page ten.'
-      };
-      return map[w] || `Can you spell the word ______ correctly?`;
-    }
-
-    /* SENTENCE PROCESSING UTILITIES */
-    function escapeRegExp(str) {
-      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-
-    function getBlankedSentence(word, customSentence) {
-      if (customSentence && customSentence.trim().length > 0) {
-        const trimmed = customSentence.trim();
-        if (trimmed.includes('______')) {
-          return trimmed;
-        }
-        if (/_{3,}/.test(trimmed)) {
-          return trimmed.replace(/_{3,}/g, '______');
-        }
-        const escaped = escapeRegExp(word.trim());
-        const regex = new RegExp(`\\b${escaped}\\b`, 'i');
-        if (regex.test(trimmed)) {
-          return trimmed.replace(regex, '______');
-        }
-        const inflected = new RegExp(`\\b${escaped}(?:s|es|ed|ing|d|er|est)?\\b`, 'i');
-        if (inflected.test(trimmed)) {
-          return trimmed.replace(inflected, '______');
-        }
-        return `${trimmed} ______`;
-      }
-      return getDefaultSentence(word);
-    }
-
-    function getCompleteSentence(word, customSentence) {
-      if (customSentence && customSentence.trim().length > 0) {
-        const trimmed = customSentence.trim();
-        if (trimmed.includes('______')) {
-          return trimmed.replace('______', word);
-        }
-        return trimmed;
-      }
-      const defaultS = getDefaultSentence(word);
-      return defaultS.replace('______', word);
-    }
-
-    function analyzeSentence(word, customSentence) {
-      const hasCustom = Boolean(customSentence && customSentence.trim().length > 0);
-      const originalSentence = hasCustom ? customSentence.trim() : getDefaultSentence(word);
-      const blankedSentence = getBlankedSentence(word, customSentence);
-      
-      let matchType = 'default';
-      if (hasCustom) {
-        if (customSentence.includes('______')) {
-          matchType = 'explicit-blank';
-        } else {
-          const escaped = escapeRegExp(word.trim());
-          const regex = new RegExp(`\\b${escaped}\\b`, 'i');
-          if (regex.test(customSentence)) {
-            matchType = 'auto-blanked';
-          } else {
-            matchType = 'fallback-blank';
-          }
-        }
-      }
-      return {
-        word,
-        hasCustom,
-        originalSentence,
-        blankedSentence,
-        completeSentence: getCompleteSentence(word, customSentence),
-        matchType
-      };
-    }
-
-    /* WORD SEARCH GENERATOR ALGORITHM */
-    function generateWordSearchGrid(wordList, size, allowDiagonal) {
-      const grid = Array.from({ length: size }, () => Array(size).fill(''));
-      const placedWords = [];
-      const directions = [
-        [0, 1],   // horizontal
-        [1, 0]    // vertical
-      ];
-      if (allowDiagonal) {
-        directions.push([1, 1]);   // diagonal down-right
-        directions.push([-1, 1]);  // diagonal up-right
-      }
-
-      const sortedWords = [...wordList].sort((a, b) => b.length - a.length);
-
-      sortedWords.forEach(rawWord => {
-        const word = rawWord.toUpperCase().replace(/[^A-Z]/g, '');
-        if (word.length === 0 || word.length > size) return;
-
-        let placed = false;
-        let attempts = 0;
-
-        while (!placed && attempts < 100) {
-          attempts++;
-          const dir = directions[Math.floor(Math.random() * directions.length)];
-          const [dRow, dCol] = dir;
-
-          let startRow = Math.floor(Math.random() * size);
-          let startCol = Math.floor(Math.random() * size);
-
-          const endRow = startRow + (word.length - 1) * dRow;
-          const endCol = startCol + (word.length - 1) * dCol;
-
-          if (endRow < 0 || endRow >= size || endCol < 0 || endCol >= size) {
-            continue;
-          }
-
-          let fits = true;
-          const coords = [];
-          for (let i = 0; i < word.length; i++) {
-            const r = startRow + i * dRow;
-            const c = startCol + i * dCol;
-            if (grid[r][c] !== '' && grid[r][c] !== word[i]) {
-              fits = false;
-              break;
+            if (activeWords.length === 0) {
+                activeListContainer.innerHTML = '<span class="empty-notice" id="empty-notice">No words yet. Type words above!</span>';
+                paperEmptyState.style.display = 'block';
+            } else {
+                paperEmptyState.style.display = 'none';
+                
+                // Populate active word list chips
+                activeWords.forEach((word, index) => {
+                    const tag = document.createElement('div');
+                    tag.className = 'word-tag';
+                    tag.innerHTML = `
+                        <span>${word}</span>
+                        <span class="remove-btn" title="Remove word" data-index="${index}">&times;</span>
+                    `;
+                    activeListContainer.appendChild(tag);
+                });
             }
-            coords.push([r, c]);
-          }
-
-          if (fits) {
-            for (let i = 0; i < word.length; i++) {
-              const r = startRow + i * dRow;
-              const c = startCol + i * dCol;
-              grid[r][c] = word[i];
-            }
-            placedWords.push({ word: rawWord, coords });
-            placed = true;
-          }
         }
-      });
 
-      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      for (let r = 0; r < size; r++) {
-        for (let c = 0; c < size; c++) {
-          if (grid[r][c] === '') {
-            grid[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
-          }
-        }
-      }
+        // Add Words Button Handler
+        addWordsBtn.addEventListener('click', () => {
+            const rawText = wordInput.value;
+            if (!rawText.trim()) return;
 
-      return { size, grid, placedWords };
-    }
+            // Split by commas, spaces, or newlines
+            const newWords = rawText
+                .split(/[\s,]+/)
+                .map(w => w.trim())
+                .filter(w => w.length > 0);
 
-    /* SCRAMBLE HELPER */
-    function scrambleWord(word) {
-      if (word.length <= 2) return word.split('').reverse().join('');
-      const arr = word.split('');
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      const scrambled = arr.join('');
-      return scrambled.toLowerCase() === word.toLowerCase() ? scrambleWord(word) : scrambled;
-    }
+            // Add unique words only
+            newWords.forEach(word => {
+                if (!activeWords.includes(word)) {
+                    activeWords.push(word);
+                }
+            });
 
-    /* MISSING LETTERS DATA GENERATOR */
-    function getMissingLetterWordData(word, pattern = 'smart') {
-      const clean = word.toUpperCase().replace(/[^A-Z]/g, '');
-      if (clean.length === 0) {
-        return { originalWord: word, displayChars: [], missingCount: 0 };
-      }
-
-      const vowels = ['A', 'E', 'I', 'O', 'U'];
-      const chars = clean.split('');
-      const missingIndices = new Set();
-
-      if (pattern === 'first' && chars.length > 0) {
-        missingIndices.add(0);
-      } else if (pattern === 'vowels') {
-        chars.forEach((c, idx) => {
-          if (vowels.includes(c)) missingIndices.add(idx);
-        });
-        if (missingIndices.size === 0 && chars.length > 1) {
-          missingIndices.add(1);
-        }
-      } else if (pattern === 'random') {
-        const count = chars.length >= 6 ? 2 : 1;
-        while (missingIndices.size < count) {
-          const idx = Math.floor(Math.random() * chars.length);
-          missingIndices.add(idx);
-        }
-      } else {
-        if (chars.length <= 3) {
-          const vIdx = chars.findIndex(c => vowels.includes(c));
-          if (vIdx >= 0) missingIndices.add(vIdx);
-          else missingIndices.add(Math.floor(chars.length / 2));
-        } else if (chars.length === 4) {
-          const vIndices = chars.map((c, idx) => vowels.includes(c) ? idx : -1).filter(idx => idx >= 0);
-          if (vIndices.length > 0) missingIndices.add(vIndices[0]);
-          else missingIndices.add(1);
-        } else {
-          const vIndices = chars.map((c, idx) => vowels.includes(c) ? idx : -1).filter(idx => idx >= 0);
-          if (vIndices.length >= 2) {
-            missingIndices.add(vIndices[0]);
-            missingIndices.add(vIndices[1]);
-          } else if (vIndices.length === 1) {
-            missingIndices.add(vIndices[0]);
-            const otherIdx = vIndices[0] === 1 ? 3 : 1;
-            if (otherIdx < chars.length) missingIndices.add(otherIdx);
-          } else {
-            missingIndices.add(1);
-            missingIndices.add(Math.min(3, chars.length - 1));
-          }
-        }
-      }
-
-      if (missingIndices.size === 0 && chars.length > 0) {
-        missingIndices.add(Math.floor(chars.length / 2));
-      }
-      if (missingIndices.size === chars.length && chars.length > 1) {
-        missingIndices.delete(0);
-      }
-
-      const displayChars = chars.map((char, index) => ({
-        char,
-        isMissing: missingIndices.has(index),
-        index,
-      }));
-
-      return {
-        originalWord: word,
-        displayChars,
-        missingCount: missingIndices.size,
-      };
-    }
-
-    /* UI INTERACTIONS */
-    function switchTab(tabId, btn) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
-      btn.classList.add('active');
-      document.getElementById('tab-pane-' + tabId).style.display = 'block';
-
-      if (tabId === 'sentences') {
-        const input = document.getElementById('input-sentences');
-        if (input && (!input.value.trim() && words.length > 0)) {
-          input.value = words.map(w => w.customSentence || getDefaultSentence(w.word)).join('\n');
-        }
-        renderSentencesMappingPreview();
-      }
-    }
-
-    function adjustZoom(delta) {
-      zoomLevel = Math.max(60, Math.min(150, zoomLevel + delta));
-      document.getElementById('zoom-value').textContent = zoomLevel + '%';
-      document.querySelectorAll('.worksheet-sheet').forEach(sheet => {
-        sheet.style.transform = `scale(${zoomLevel / 100})`;
-      });
-    }
-
-    function addWordsFromInput() {
-      const input = document.getElementById('input-words');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const tokens = text.split(/[\n, ]+/).map(w => w.trim().toLowerCase().replace(/[^a-z0-9-]/g, '')).filter(w => w.length > 0);
-      const existing = new Set(words.map(w => w.word.toLowerCase()));
-
-      tokens.forEach(token => {
-        if (!existing.has(token)) {
-          words.push({
-            id: 'w_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-            word: token,
-            customSentence: getDefaultSentence(token)
-          });
-          existing.add(token);
-        }
-      });
-
-      input.value = '';
-      regenerateWordSearch();
-      renderApp();
-    }
-
-    function removeWord(id) {
-      words = words.filter(w => w.id !== id);
-      regenerateWordSearch();
-      renderApp();
-    }
-
-    function clearAllWords() {
-      words = [];
-      regenerateWordSearch();
-      renderApp();
-    }
-
-    function handleUnifiedSentencesInput() {
-      const input = document.getElementById('input-sentences');
-      if (!input) return;
-      const lines = input.value.split('\n');
-      words.forEach((w, idx) => {
-        if (lines[idx] !== undefined) {
-          w.customSentence = lines[idx];
-        }
-      });
-      renderSentencesMappingPreview();
-      renderApp();
-    }
-
-    function populateDefaultSentences() {
-      words.forEach(w => {
-        w.customSentence = getDefaultSentence(w.word);
-      });
-      const input = document.getElementById('input-sentences');
-      if (input) {
-        input.value = words.map(w => w.customSentence).join('\n');
-      }
-      renderSentencesMappingPreview();
-      renderApp();
-    }
-
-    function clearAllSentences() {
-      words.forEach(w => {
-        w.customSentence = '';
-      });
-      const input = document.getElementById('input-sentences');
-      if (input) input.value = '';
-      renderSentencesMappingPreview();
-      renderApp();
-    }
-
-    function renderSentencesMappingPreview() {
-      const container = document.getElementById('sentences-mapping-preview');
-      const countLabel = document.getElementById('sentence-mapping-count');
-      if (!container) return;
-
-      countLabel.textContent = `${words.length} words configured`;
-      if (words.length === 0) {
-        container.innerHTML = '<div style="font-size: 11px; color: var(--color-slate-400); padding: 8px;">No words added yet. Add words in Tab 1 first!</div>';
-        return;
-      }
-
-      container.innerHTML = words.map((item, index) => `
-        <div style="display: flex; align-items: center; gap: 8px; background: #ffffff; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--color-slate-200);">
-          <span style="font-weight: 700; font-size: 11px; color: var(--color-primary); min-width: 20px;">#${index + 1}</span>
-          <span style="font-weight: 700; font-size: 12px; text-transform: uppercase; min-width: 60px;">${item.word}</span>
-          <input type="text" class="form-input" style="font-size: 11px; padding: 4px 8px;" value="${item.customSentence || ''}" placeholder="Enter sentence with ______" oninput="updateWordSentence(${index}, this.value)">
-        </div>
-      `).join('');
-    }
-
-    function updateWordSentence(index, val) {
-      if (words[index]) {
-        words[index].customSentence = val;
-        renderApp();
-      }
-    }
-
-    function regenerateWordSearch() {
-      const size = parseInt(document.getElementById('opt-grid-size').value, 10) || 10;
-      const allowDiagonal = document.getElementById('opt-diagonal').checked;
-      const wordList = words.map(w => w.word);
-      wordSearchData = generateWordSearchGrid(wordList, size, allowDiagonal);
-      renderApp();
-    }
-
-    function updateThemeAndConfig() {
-      const theme = document.getElementById('cfg-theme').value;
-      document.body.className = 'theme-' + theme;
-      renderApp();
-    }
-
-    function updateConfig() {
-      renderApp();
-    }
-
-    function toggleSolutionOverlay() {
-      showSolutionOverlay = !showSolutionOverlay;
-      const btnText = document.getElementById('solution-btn-text');
-      btnText.textContent = showSolutionOverlay ? '👁️ Hide Answer Overlay' : '👁️ Show Answer Overlay';
-      renderApp();
-    }
-
-    /* RENDER ENGINE */
-    function renderApp() {
-      document.getElementById('tab-word-count').textContent = words.length;
-
-      // Render Word Chips in Tab 1
-      const chipsContainer = document.getElementById('word-chips-container');
-      if (words.length === 0) {
-        chipsContainer.innerHTML = '<span style="font-size: 11px; color: var(--color-slate-400);">No words added yet. Type words above!</span>';
-      } else {
-        chipsContainer.innerHTML = words.map(w => `
-          <div class="word-chip">
-            <span>${w.word}</span>
-            <span class="chip-remove" onclick="removeWord('${w.id}')">&times;</span>
-          </div>
-        `).join('');
-      }
-
-      // Gather Options
-      const title = document.getElementById('cfg-title').value || 'Spelling & Phonics Practice';
-      const instructions = document.getElementById('cfg-instructions').value || 'Complete each activity carefully on the lines provided.';
-      const gradeUnit = document.getElementById('cfg-grade-unit').value;
-      const paperSize = document.getElementById('cfg-paper-size').value;
-      const fontFamily = document.getElementById('cfg-font-family').value;
-      const standalonePages = document.getElementById('cfg-standalone-pages').checked;
-
-      const incName = document.getElementById('cfg-inc-name').checked;
-      const incDate = document.getElementById('cfg-inc-date').checked;
-      const incScore = document.getElementById('cfg-inc-score').checked;
-      const incAnswers = document.getElementById('cfg-inc-answers').checked;
-
-      const modHandwriting = document.getElementById('mod-handwriting').checked;
-      const hwLinesCount = parseInt(document.getElementById('opt-handwriting-lines').value, 10);
-      const hwSpacing = document.getElementById('opt-line-spacing').value;
-
-      const modSentences = document.getElementById('mod-sentences').checked;
-      const modWordSearch = document.getElementById('mod-wordsearch').checked;
-      const modMissing = document.getElementById('mod-missingletters').checked;
-      const missingPattern = document.getElementById('opt-missing-pattern').value;
-
-      const modScramble = document.getElementById('mod-scramble').checked;
-      const modAbc = document.getElementById('mod-abc').checked;
-
-      // Build active modules list
-      const activeModules = [];
-      if (modHandwriting && words.length > 0) activeModules.push('handwriting');
-      if (modSentences && words.length > 0) activeModules.push('sentences');
-      if (modWordSearch && words.length > 0) activeModules.push('wordsearch');
-      if (modMissing && words.length > 0) activeModules.push('missing');
-      if (modScramble && words.length > 0) activeModules.push('scramble');
-      if (modAbc && words.length > 0) activeModules.push('abc');
-
-      const sheetsContainer = document.getElementById('sheets-container');
-      sheetsContainer.innerHTML = '';
-
-      if (activeModules.length === 0) {
-        sheetsContainer.innerHTML = `
-          <div class="worksheet-sheet ${paperSize === 'letter' ? 'letter-size' : ''} border-classic font-${fontFamily}">
-            <div style="text-align: center; padding: 60px 20px; color: var(--color-slate-500);">
-              <h2 style="font-size: 20px; margin-bottom: 10px;">No Active Modules or Words</h2>
-              <p>Please add some words in Tab 1 and enable at least one activity module in Tab 3.</p>
-            </div>
-          </div>
-        `;
-        return;
-      }
-
-      if (wordSearchData.grid.length === 0 && words.length > 0) {
-        regenerateWordSearch();
-        return;
-      }
-
-      // Helper for sheet header HTML
-      const renderSheetHeader = (pageNum, totalPages, moduleTitle) => `
-        <div class="sheet-header">
-          ${(incName || incDate || incScore) ? `
-            <div class="student-meta-bar">
-              <div class="meta-left">
-                ${incName ? `<div>Name: <span class="meta-line name-line"></span></div>` : ''}
-                ${incDate ? `<div>Date: <span class="meta-line date-line"></span></div>` : ''}
-              </div>
-              <div class="meta-right">
-                ${gradeUnit ? `<div class="grade-badge">${gradeUnit}</div>` : ''}
-                <div class="page-indicator">Page ${pageNum} of ${totalPages}</div>${incScore ? `<div class="score-badge">Score: _____ / ${words.length}</div>` : ''}
-              </div>
-            </div>
-          ` : ''}
-          <div class="sheet-title-box">
-            <h2 class="sheet-main-title">${title}</h2>
-            <div class="sheet-sub-title">${moduleTitle}</div>
-            <div class="sheet-instructions">${instructions}</div>
-          </div>
-        </div>
-      `;
-
-      const renderSheetFooter = () => `
-        <div class="sheet-footer">
-          <span>Stitch Minded • Spelling & Phonics Worksheets</span>
-          <span>Educational Printable Resource</span>
-        </div>
-      `;
-
-      if (standalonePages) {
-        // One module per page
-        const totalSheets = activeModules.length + (incAnswers ? 1 : 0);
-        let sheetIndex = 1;
-
-        activeModules.forEach(mod => {
-          const sheetDiv = document.createElement('div');
-          sheetDiv.className = `worksheet-sheet ${paperSize === 'letter' ? 'letter-size' : ''} border-classic font-${fontFamily}`;
-          sheetDiv.style.transform = `scale(${zoomLevel / 100})`;
-
-          let modTitle = '';
-          let bodyHtml = '';
-
-          if (mod === 'handwriting') {
-            modTitle = 'Activity: Clean Handwriting Practice';
-            bodyHtml = `
-              <div class="activity-card-container">
-                <div class="module-header">
-                  <div class="module-title-left">
-                    <div class="module-badge">1</div>
-                    <div class="module-heading">Trace & Write Spelling Words</div>
-                  </div>
-                  <div class="module-hint">Practice proper letter formation on the 3-line ruling</div>
-                </div>
-                <div class="handwriting-grid">
-                  ${words.map((w, idx) => `
-                    <div class="handwriting-item">
-                      <div class="word-prompt"><span class="num">${idx + 1}.</span> ${w.word}</div>${Array.from({ length: hwLinesCount }).map(() => `
-                        <div class="ruled-line-box spacing-${hwSpacing}">
-                          <div class="dashed-midline"></div>
-                        </div>
-                      `).join('')}
-                    </div>
-                  `).join('')}
-                </div>
-              </div>
-            `;
-          } else if (mod === 'sentences') {
-            modTitle = 'Activity: Sentence Completion';
-            bodyHtml = `
-              <div class="activity-card-container">
-                <div class="module-header">
-                  <div class="module-title-left">
-                    <div class="module-badge">2</div>
-                    <div class="module-heading">Fill in the Missing Words</div>
-                  </div>
-                  <div class="module-hint">Select the correct word from the word bank to complete each sentence</div>
-                </div>
-                <div class="word-bank-container">
-                  <span class="word-bank-label">Word Bank:</span>
-                  ${words.map(w => `
-                    <div class="bank-word-card">
-                      <span class="checkbox-square"></span>
-                      ${w.word}
-                    </div>
-                  `).join('')}
-                </div>
-                <div class="sentence-list">
-                  ${words.map((w, idx) => {
-                    const analysis = analyzeSentence(w.word, w.customSentence);
-                    const parts = analysis.blankedSentence.split('______');
-                    return `
-                      <div class="sentence-row">
-                        <span class="sentence-num">${idx + 1}.</span>
-                        <div>
-                          ${parts[0]}<span class="write-blank-line" style="${showSolutionOverlay ? 'color: var(--color-primary); font-weight: 700; text-align: center;' : ''}">${showSolutionOverlay ? w.word : ''}</span>${parts[1] || ''}
-                        </div>
-                      </div>
-                    `;
-                  }).join('')}
-                </div>
-              </div>
-            `;
-          } else if (mod === 'wordsearch') {
-            modTitle = 'Activity: Word Search Puzzle';
-            const size = wordSearchData.size;
-            bodyHtml = `
-              <div class="activity-card-container">
-                <div class="module-header">
-                  <div class="module-title-left">
-                    <div class="module-badge">3</div>
-                    <div class="module-heading">Find the Hidden Words</div>
-                  </div>
-                  <div class="module-hint">Locate and circle your spelling words in the grid</div>
-                </div>
-                <div class="word-search-layout">
-                  <div class="grid-container" style="grid-template-columns: repeat(${size}, 32px);">
-                    ${wordSearchData.grid.flatMap((row, rIdx) => 
-                      row.map((cell, cIdx) => {
-                        let isHighlighted = false;
-                        if (showSolutionOverlay) {
-                          isHighlighted = wordSearchData.placedWords.some(pw => 
-                            pw.coords.some(([pr, pc]) => pr === rIdx && pc === cIdx)
-                          );
-                        }
-                        return `<div class="grid-cell ${isHighlighted ? 'highlight-solution' : ''}">${cell}</div>`;
-                      })
-                    ).join('')}
-                  </div>
-                  <div class="checklist-container">
-                    <div class="checklist-heading">Word Checklist:</div>
-                    <div class="checklist-grid">
-                      ${words.map(w => `
-                        <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;">
-                          <div style="width: 14px; height: 14px; border: 1.5px solid var(--color-slate-800); border-radius: 3px; background: #fff;"></div>
-                          <span>${w.word}</span>
-                        </div>
-                      `).join('')}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            `;
-          } else if (mod === 'missing') {
-            modTitle = 'Activity: Missing Letters';
-            bodyHtml = `
-              <div class="activity-card-container">
-                <div class="module-header">
-                  <div class="module-title-left">
-                    <div class="module-badge">4</div>
-                    <div class="module-heading">Complete the Spelling Words</div>
-                  </div>
-                  <div class="module-hint">Fill in the missing letter tiles and rewrite the full word</div>
-                </div>
-                <div class="missing-letters-grid">
-                  ${words.map((w, idx) => {
-                    const missingData = getMissingLetterWordData(w.word, missingPattern);
-                    return `
-                      <div class="missing-card">
-                        <div class="missing-card-top">
-                          <div class="missing-card-num"><span style="color:var(--color-primary)">#${idx + 1}</span> Phonics Challenge</div>
-                          <div class="missing-card-badge">${missingData.missingCount} missing</div>
-                        </div>
-                        <div class="missing-letter-tiles">
-                          ${missingData.displayChars.map(dc => {
-                            if (dc.isMissing) {
-                              return `<div class="letter-tile blank-tile ${showSolutionOverlay ? 'show-solution' : ''}">${showSolutionOverlay ? dc.char : ''}</div>`;
-                            } else {
-                              return `<div class="letter-tile">${dc.char}</div>`;
-                            }
-                          }).join('')}
-                        </div>
-                        <div class="missing-write-line-row">
-                          <span class="missing-write-label">Write Word:</span>
-                          <div class="missing-write-line">
-                            <div class="midline"></div>
-                            <span style="position: relative; z-index: 2; font-weight: 700; font-size: 13px; ${showSolutionOverlay ? 'color: var(--color-primary);' : 'color: transparent;'}">${showSolutionOverlay ? w.word : ''}</span>
-                          </div>
-                        </div>
-                      </div>
-                    `;
-                  }).join('')}
-                </div>
-              </div>
-            `;
-          } else if (mod === 'scramble') {
-            modTitle = 'Activity: Word Scramble';
-            bodyHtml = `
-              <div class="activity-card-container">
-                <div class="module-header">
-                  <div class="module-title-left">
-                    <div class="module-badge">5</div>
-                    <div class="module-heading">Unscramble the Letters</div>
-                  </div>
-                  <div class="module-hint">Rearrange the jumbled letters to spell each word correctly</div>
-                </div>
-                <div class="scramble-grid">
-                  ${words.map((w, idx) => {
-                    const scrambled = scrambleWord(w.word);
-                    return `
-                      <div class="scramble-card">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                          <span style="font-weight: 700; font-size: 11px; color: var(--color-slate-500);">${idx + 1}.</span>
-                          <div class="letter-badge-row">
-                            ${scrambled.toUpperCase().split('').map(c => `<div class="scramble-letter-badge">${c}</div>`).join('')}
-                          </div>
-                        </div>
-                        <div class="scramble-boxes">
-                          ${w.word.split('').map(() => `<div class="scramble-blank-box"></div>`).join('')}
-                        </div>
-                      </div>
-                    `;
-                  }).join('')}
-                </div>
-              </div>
-            `;
-          } else if (mod === 'abc') {
-            modTitle = 'Activity: Alphabetical Order';
-            bodyHtml = `
-              <div class="activity-card-container">
-                <div class="module-header">
-                  <div class="module-title-left">
-                    <div class="module-badge">6</div>
-                    <div class="module-heading">Alphabetical (ABC) Sort</div>
-                  </div>
-                  <div class="module-hint">Rewrite your spelling words in alphabetical order</div>
-                </div>
-                <div style="background: #ffffff; border: 1px solid var(--theme-card-border); border-radius: 8px; padding: 14px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px;">
-                  <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-slate-600); width: 100%;">Words to Sort:</span>
-                  ${words.map(w => `<span class="bank-word-card">${w.word}</span>`).join('')}
-                </div>
-                <div class="abc-sort-grid">
-                  ${words.map((w, idx) => `
-                    <div class="abc-sort-row">
-                      <span class="num">${idx + 1}.</span>
-                      <div class="ruled-bottom"></div>
-                    </div>
-                  `).join('')}
-                </div>
-              </div>
-            `;
-          }
-
-          sheetDiv.innerHTML = `
-            <div>
-              ${renderSheetHeader(sheetIndex, totalSheets, modTitle)}
-              ${bodyHtml}
-            </div>
-            ${renderSheetFooter()}
-          `;
-          sheetsContainer.appendChild(sheetDiv);
-          sheetIndex++;
+            // Reset input and re-render
+            wordInput.value = '';
+            render();
         });
 
-        // Optional Answer Key Sheet
-        if (incAnswers) {
-          const sheetDiv = document.createElement('div');
-          sheetDiv.className = `worksheet-sheet ${paperSize === 'letter' ? 'letter-size' : ''} border-classic font-${fontFamily}`;
-          sheetDiv.style.transform = `scale(${zoomLevel / 100})`;
+        // Clear All Button Handler
+        clearAllBtn.addEventListener('click', () => {
+            activeWords = [];
+            render();
+        });
 
-          sheetDiv.innerHTML = `
-            <div>
-              ${renderSheetHeader(sheetIndex, totalSheets, 'Teacher Answer Key & Reference')}
-              <div class="activity-card-container">
-                <div class="module-header">
-                  <div class="module-title-left">
-                    <div class="module-badge" style="background: var(--color-emerald-600);">✓</div>
-                    <div class="module-heading">Complete Master Answer Key</div>
-                  </div>
-                  <div class="module-hint">Verified solutions for grading and spelling verification</div>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-                  <div style="background: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid var(--theme-card-border);">
-                    <h4 style="font-size: 12px; text-transform: uppercase; margin-bottom: 8px; color: var(--color-primary);">Spelling Word List & Sentences</h4>
-                    <ul style="padding-left: 18px; font-size: 12px; display: flex; flex-direction: column; gap: 6px;">
-                      ${words.map(w => `<li><strong>${w.word}</strong>:${getCompleteSentence(w.word, w.customSentence)}</li>`).join('')}
-                    </ul>
-                  </div>
-                  <div style="background: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid var(--theme-card-border);">
-                    <h4 style="font-size: 12px; text-transform: uppercase; margin-bottom: 8px; color: var(--color-primary);">Alphabetical Sort Order</h4>
-                    <ol style="padding-left: 18px; font-size: 12px; display: flex; flex-direction: column; gap: 4px;">
-                      {[...words].sort((a, b) => a.word.localeCompare(b.word)).map(w => `<li>${w.word}</li>`).join('')}
-                    </ol>
-                  </div>
-                </div>
-              </div>
-            </div>
-            ${renderSheetFooter()}
-          `;
-          sheetsContainer.appendChild(sheetDiv);
-        }
+        // Event delegation for individual word removal tags
+        activeListContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-btn')) {
+                const index = parseInt(e.target.getAttribute('data-index'), 10);
+                activeWords.splice(index, 1);
+                render();
+            }
+        });
 
-      } else {
-        // Multi-module single page layout (or compact layout)
-        const sheetDiv = document.createElement('div');
-        sheetDiv.className = `worksheet-sheet ${paperSize === 'letter' ? 'letter-size' : ''} border-classic font-${fontFamily}`;
-        sheetDiv.style.transform = `scale(${zoomLevel / 100})`;
-
-        let bodyHtml = '';
-
-        if (modHandwriting && words.length > 0) {
-          bodyHtml += `
-            <div class="activity-card-container">
-              <div class="module-header">
-                <div class="module-title-left">
-                  <div class="module-badge">1</div>
-                  <div class="module-heading">Trace & Write Spelling Words</div>
-                </div>
-                <div class="module-hint">Practice proper letter formation on the 3-line ruling</div>
-              </div>
-              <div class="handwriting-grid">
-                ${words.map((w, idx) => `
-                  <div class="handwriting-item">
-                    <div class="word-prompt"><span class="num">${idx + 1}.</span> ${w.word}</div>${Array.from({ length: hwLinesCount }).map(() => `
-                      <div class="ruled-line-box spacing-${hwSpacing}">
-                        <div class="dashed-midline"></div>
-                      </div>
-                    `).join('')}
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          `;
-        }
-
-        if (modSentences && words.length > 0) {
-          bodyHtml += `
-            <div class="activity-card-container">
-              <div class="module-header">
-                <div class="module-title-left">
-                  <div class="module-badge">2</div>
-                  <div class="module-heading">Sentence Completion</div>
-                </div>
-                <div class="module-hint">Fill in the missing words from the word bank</div>
-              </div>
-              <div class="word-bank-container">
-                <span class="word-bank-label">Word Bank:</span>
-                ${words.map(w => `
-                  <div class="bank-word-card">
-                    <span class="checkbox-square"></span>
-                    ${w.word}
-                  </div>
-                `).join('')}
-              </div>
-              <div class="sentence-list">
-                ${words.map((w, idx) => {
-                  const analysis = analyzeSentence(w.word, w.customSentence);
-                  const parts = analysis.blankedSentence.split('______');
-                  return `
-                    <div class="sentence-row">
-                      <span class="sentence-num">${idx + 1}.</span>
-                      <div>
-                        ${parts[0]}<span class="write-blank-line" style="${showSolutionOverlay ? 'color: var(--color-primary); font-weight: 700; text-align: center;' : ''}">${showSolutionOverlay ? w.word : ''}</span>${parts[1] || ''}
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
-          `;
-        }
-
-        if (modWordSearch && words.length > 0) {
-          const size = wordSearchData.size;
-          bodyHtml += `
-            <div class="activity-card-container">
-              <div class="module-header">
-                <div class="module-title-left">
-                  <div class="module-badge">3</div>
-                  <div class="module-heading">Word Search Puzzle</div>
-                </div>
-                <div class="module-hint">Find and circle hidden words</div>
-              </div>
-              <div class="word-search-layout">
-                <div class="grid-container" style="grid-template-columns: repeat(${size}, 28px);">
-                  ${wordSearchData.grid.flatMap((row, rIdx) => 
-                    row.map((cell, cIdx) => {
-                      let isHighlighted = false;
-                      if (showSolutionOverlay) {
-                        isHighlighted = wordSearchData.placedWords.some(pw => 
-                          pw.coords.some(([pr, pc]) => pr === rIdx && pc === cIdx)
-                        );
-                      }
-                      return `<div class="grid-cell" style="width:28px; height:28px; font-size:12px; ${isHighlighted ? 'background:#fef08a; color:#000;' : ''}">${cell}</div>`;
-                    })
-                  ).join('')}
-                </div>
-                <div class="checklist-container">
-                  <div class="checklist-heading">Word Checklist:</div>
-                  <div class="checklist-grid">
-                    ${words.map(w => `
-                      <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700;">
-                        <div style="width: 12px; height: 12px; border: 1.5px solid var(--color-slate-800); border-radius: 2px; background: #fff;"></div>
-                        <span>${w.word}</span>
-                      </div>
-                    `).join('')}
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-        }
-
-        sheetDiv.innerHTML = `
-          <div>
-            ${renderSheetHeader(1, 1, 'Spelling & Phonics Practice')}
-            ${bodyHtml}
-          </div>
-          ${renderSheetFooter()}
-        `;
-        sheetsContainer.appendChild(sheetDiv);
-      }
-    }
-
-    // Initial render on load
-    window.addEventListener('DOMContentLoaded', () => {
-      regenerateWordSearch();
-      renderApp();
-    });
-  </script>
+        // Initial render on load
+        render();
+    </script>
 </body>
 </html>
