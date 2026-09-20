@@ -976,7 +976,7 @@
     }
 
     /* -------------------------------------------------------------
-       ACTIVITY 5: ALPHABETICAL ORDER
+       ACTIVITY 6: ALPHABETICAL ORDER
     ------------------------------------------------------------- */
     .abc-sort-grid {
       display: grid;
@@ -1377,6 +1377,22 @@
     let showSolutionOverlay = false;
     let zoomLevel = 100;
 
+    /* DEFAULT SENTENCE FALLBACKS */
+    function getDefaultSentence(word) {
+      const w = word.toLowerCase();
+      const map = {
+        'cat': 'The cute ______ was sleeping on the mat.',
+        'dog': 'Our friendly ______ loves to chase the ball.',
+        'pig': 'The pink ______ played happily in the mud.',
+        'sun': 'The bright ______ shines warmly in the sky.',
+        'hat': 'Put on your sun ______ before going outside.',
+        'bed': 'I go to ______ when it is bedtime.',
+        'ball': 'Kick the ______ across the green grass.',
+        'book': 'Please open your reading ______ to page ten.'
+      };
+      return map[w] || `Can you spell the word ______ correctly?`;
+    }
+
     /* SENTENCE PROCESSING UTILITIES */
     function escapeRegExp(str) {
       return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -1459,7 +1475,6 @@
         directions.push([-1, 1]);  // diagonal up-right
       }
 
-      // Sort longest words first
       const sortedWords = [...wordList].sort((a, b) => b.length - a.length);
 
       sortedWords.forEach(rawWord => {
@@ -1477,7 +1492,6 @@
           let startRow = Math.floor(Math.random() * size);
           let startCol = Math.floor(Math.random() * size);
 
-          // Calculate end bounds
           const endRow = startRow + (word.length - 1) * dRow;
           const endCol = startCol + (word.length - 1) * dCol;
 
@@ -1485,7 +1499,6 @@
             continue;
           }
 
-          // Check if space is valid and conflict-free
           let fits = true;
           const coords = [];
           for (let i = 0; i < word.length; i++) {
@@ -1510,7 +1523,6 @@
         }
       });
 
-      // Fill remaining empty cells with random letters
       const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
@@ -1562,7 +1574,6 @@
           missingIndices.add(idx);
         }
       } else {
-        // Smart Foundation Phase default
         if (chars.length <= 3) {
           const vIdx = chars.findIndex(c => vowels.includes(c));
           if (vIdx >= 0) missingIndices.add(vIdx);
@@ -1671,204 +1682,475 @@
       const input = document.getElementById('input-sentences');
       if (!input) return;
       const lines = input.value.split('\n');
-      words.forEach((item, idx) => {
-        const line = lines[idx];
-        if (line !== undefined && line.trim().length > 0) {
-          item.customSentence = line.trim().replace(/^(\d+[\.\)]\s*|\[\d+\]\s*)/, '');
-        } else {
-          item.customSentence = '';
+      words.forEach((w, idx) => {
+        if (lines[idx] !== undefined) {
+          w.customSentence = lines[idx];
         }
       });
       renderSentencesMappingPreview();
-      renderWorksheet();
+      renderApp();
     }
 
     function populateDefaultSentences() {
-      const input = document.getElementById('input-sentences');
-      const text = words.map(w => w.customSentence || getDefaultSentence(w.word)).join('\n');
-      if (input) input.value = text;
       words.forEach(w => {
-        if (!w.customSentence) w.customSentence = getDefaultSentence(w.word);
+        w.customSentence = getDefaultSentence(w.word);
       });
+      const input = document.getElementById('input-sentences');
+      if (input) {
+        input.value = words.map(w => w.customSentence).join('\n');
+      }
       renderSentencesMappingPreview();
-      renderWorksheet();
+      renderApp();
     }
 
     function clearAllSentences() {
-      const input = document.getElementById('input-sentences');
-      if (input) input.value = '';
       words.forEach(w => {
         w.customSentence = '';
       });
+      const input = document.getElementById('input-sentences');
+      if (input) input.value = '';
       renderSentencesMappingPreview();
-      renderWorksheet();
+      renderApp();
     }
 
     function renderSentencesMappingPreview() {
-      const previewBox = document.getElementById('sentences-mapping-preview');
+      const container = document.getElementById('sentences-mapping-preview');
       const countLabel = document.getElementById('sentence-mapping-count');
-      if (!previewBox) return;
+      if (!container) return;
 
-      if (countLabel) {
-        countLabel.textContent = `${words.length} word${words.length === 1 ? '' : 's'}`;
-      }
-
+      countLabel.textContent = `${words.length} words configured`;
       if (words.length === 0) {
-        previewBox.innerHTML = '<span style="font-size: 11px; color: #94a3b8; font-style: italic;">Add words in the Word List tab first.</span>';
+        container.innerHTML = '<div style="font-size: 11px; color: var(--color-slate-400); padding: 8px;">No words added yet. Add words in Tab 1 first!</div>';
         return;
       }
 
-      previewBox.innerHTML = words.map((item, idx) => {
-        const analysis = analyzeSentence(item.word, item.customSentence);
-        let badgeStyle = 'background: #f1f5f9; color: #64748b;';
-        let badgeText = 'Auto-Default';
-        if (analysis.matchType === 'auto-blanked') {
-          badgeStyle = 'background: #d1fae5; color: #065f46; font-weight: 700; border: 1px solid #6ee7b7;';
-          badgeText = '✓ Auto-Blanked';
-        } else if (analysis.matchType === 'explicit-blank') {
-          badgeStyle = 'background: #dbeafe; color: #1e40af; font-weight: 700; border: 1px solid #93c5fd;';
-          badgeText = 'Custom Blank';
-        } else if (analysis.matchType === 'fallback-blank') {
-          badgeStyle = 'background: #fef3c7; color: #92400e; font-weight: 700; border: 1px solid #fde68a;';
-          badgeText = 'Custom + Blank';
-        }
+      container.innerHTML = words.map((item, index) => `
+        <div style="display: flex; align-items: center; gap: 8px; background: #ffffff; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--color-slate-200);">
+          <span style="font-weight: 700; font-size: 11px; color: var(--color-primary); min-width: 20px;">#${index + 1}</span>
+          <span style="font-weight: 700; font-size: 12px; text-transform: uppercase; min-width: 60px;">${item.word}</span>
+          <input type="text" class="form-input" style="font-size: 11px; padding: 4px 8px;" value="${item.customSentence || ''}" placeholder="Enter sentence with ______" oninput="updateWordSentence(${index}, this.value)">
+        </div>
+      `).join('');
+    }
 
-        return `
-          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 11px; display: flex; flex-direction: column; gap: 4px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-weight: 700; color: var(--color-primary); text-transform: uppercase;">
-                ${idx + 1}. ${item.word}
-              </span>
-              <span style="font-size: 9px; padding: 2px 6px; border-radius: 9999px; ${badgeStyle}">
-                ${badgeText}
-              </span>
-            </div>
-            <div style="background: #f8fafc; padding: 4px 6px; border-radius: 4px; border: 1px solid #f1f5f9; font-size: 10px; color: #334155;">
-              <strong style="color: #64748b; font-size: 9px; text-transform: uppercase;">Student:</strong> "${analysis.blankedSentence}"
-            </div>
-            ${analysis.hasCustom ? `
-              <div style="font-size: 10px; color: #64748b; padding-left: 2px;">
-                <span style="font-weight: 600; text-transform: uppercase; font-size: 9px;">Key:</span> "${analysis.originalSentence}"
-              </div>
-            ` : ''}
-          </div>
-        `;
-      }).join('');
+    function updateWordSentence(index, val) {
+      if (words[index]) {
+        words[index].customSentence = val;
+        renderApp();
+      }
     }
 
     function regenerateWordSearch() {
-      const size = parseInt(document.getElementById('opt-grid-size')?.value || '10');
-      const diagonal = document.getElementById('opt-diagonal')?.checked || false;
-      const wordStrings = words.map(w => w.word);
-      wordSearchData = generateWordSearchGrid(wordStrings, size, diagonal);
-      renderWorksheet();
+      const size = parseInt(document.getElementById('opt-grid-size').value, 10) || 10;
+      const allowDiagonal = document.getElementById('opt-diagonal').checked;
+      const wordList = words.map(w => w.word);
+      wordSearchData = generateWordSearchGrid(wordList, size, allowDiagonal);
+      renderApp();
+    }
+
+    function updateThemeAndConfig() {
+      const theme = document.getElementById('cfg-theme').value;
+      document.body.className = 'theme-' + theme;
+      renderApp();
+    }
+
+    function updateConfig() {
+      renderApp();
     }
 
     function toggleSolutionOverlay() {
       showSolutionOverlay = !showSolutionOverlay;
-      document.getElementById('solution-btn-text').textContent = showSolutionOverlay ? '🙈 Hide Answer Overlay' : '👁️ Show Answer Overlay';
-      renderWorksheet();
+      const btnText = document.getElementById('solution-btn-text');
+      btnText.textContent = showSolutionOverlay ? '👁️ Hide Answer Overlay' : '👁️ Show Answer Overlay';
+      renderApp();
     }
 
-    function updateThemeAndConfig() {
-      const theme = document.getElementById('cfg-theme')?.value || 'purple';
-      document.body.className = 'theme-' + theme;
-      document.body.setAttribute('data-theme', theme);
-      renderWorksheet();
-    }
-
-    function updateConfig() {
-      renderWorksheet();
-    }
-
-    /* RENDER APPLICATION CONTROLS & CHIPS */
+    /* RENDER ENGINE */
     function renderApp() {
-      // Update count
       document.getElementById('tab-word-count').textContent = words.length;
 
-      // Render Word Chips
-      const chipsBox = document.getElementById('word-chips-container');
+      // Render Word Chips in Tab 1
+      const chipsContainer = document.getElementById('word-chips-container');
       if (words.length === 0) {
-        chipsBox.innerHTML = '<span style="font-size: 11px; color: #94a3b8; font-style: italic;">No words yet. Type words above!</span>';
+        chipsContainer.innerHTML = '<span style="font-size: 11px; color: var(--color-slate-400);">No words added yet. Type words above!</span>';
       } else {
-        chipsBox.innerHTML = words.map((item, idx) => `
-          <span class="word-chip">
-            <span style="color: #94a3b8; font-size: 10px;">${idx + 1}.</span>
-            ${item.word}
-            <span class="chip-remove" onclick="removeWord('${item.id}')">&times;</span>
-          </span>
+        chipsContainer.innerHTML = words.map(w => `
+          <div class="word-chip">
+            <span>${w.word}</span>
+            <span class="chip-remove" onclick="removeWord('${w.id}')">&times;</span>
+          </div>
         `).join('');
       }
 
-      // Render Sentences Mapping Preview
-      renderSentencesMappingPreview();
+      // Gather Options
+      const title = document.getElementById('cfg-title').value || 'Spelling & Phonics Practice';
+      const instructions = document.getElementById('cfg-instructions').value || 'Complete each activity carefully on the lines provided.';
+      const gradeUnit = document.getElementById('cfg-grade-unit').value;
+      const paperSize = document.getElementById('cfg-paper-size').value;
+      const fontFamily = document.getElementById('cfg-font-family').value;
+      const standalonePages = document.getElementById('cfg-standalone-pages').checked;
 
-      renderWorksheet();
-    }
+      const incName = document.getElementById('cfg-inc-name').checked;
+      const incDate = document.getElementById('cfg-inc-date').checked;
+      const incScore = document.getElementById('cfg-inc-score').checked;
+      const incAnswers = document.getElementById('cfg-inc-answers').checked;
 
-    /* RENDER PRINTABLE WORKSHEET SHEETS */
-    function renderWorksheet() {
-      const container = document.getElementById('sheets-container');
-      if (!container) return;
+      const modHandwriting = document.getElementById('mod-handwriting').checked;
+      const hwLinesCount = parseInt(document.getElementById('opt-handwriting-lines').value, 10);
+      const hwSpacing = document.getElementById('opt-line-spacing').value;
 
-      const theme = document.getElementById('cfg-theme')?.value || 'purple';
-      const title = document.getElementById('cfg-title')?.value || 'Spelling & Phonics Practice';
-      const instructions = document.getElementById('cfg-instructions')?.value || '';
-      const gradeUnit = document.getElementById('cfg-grade-unit')?.value || '';
-      const standalonePages = document.getElementById('cfg-standalone-pages')?.checked ?? true;
-      const incName = document.getElementById('cfg-inc-name')?.checked ?? true;
-      const incDate = document.getElementById('cfg-inc-date')?.checked ?? true;
-      const incScore = document.getElementById('cfg-inc-score')?.checked ?? true;
-      const incAnswers = document.getElementById('cfg-inc-answers')?.checked ?? false;
-      const paperSize = document.getElementById('cfg-paper-size')?.value || 'a4';
-      const fontFamily = document.getElementById('cfg-font-family')?.value || 'lexend';
+      const modSentences = document.getElementById('mod-sentences').checked;
+      const modWordSearch = document.getElementById('mod-wordsearch').checked;
+      const modMissing = document.getElementById('mod-missingletters').checked;
+      const missingPattern = document.getElementById('opt-missing-pattern').value;
 
-      const modHandwriting = document.getElementById('mod-handwriting')?.checked ?? true;
-      const modSentences = document.getElementById('mod-sentences')?.checked ?? true;
-      const modWordSearch = document.getElementById('mod-wordsearch')?.checked ?? true;
-      const modMissingLetters = document.getElementById('mod-missingletters')?.checked ?? true;
-      const missingPattern = document.getElementById('opt-missing-pattern')?.value || 'smart';
-      const modScramble = document.getElementById('mod-scramble')?.checked ?? false;
-      const modAbc = document.getElementById('mod-abc')?.checked ?? false;
+      const modScramble = document.getElementById('mod-scramble').checked;
+      const modAbc = document.getElementById('mod-abc').checked;
 
-      const handwritingLines = parseInt(document.getElementById('opt-handwriting-lines')?.value || '2');
-      const lineSpacing = document.getElementById('opt-line-spacing')?.value || 'normal';
+      // Build active modules list
+      const activeModules = [];
+      if (modHandwriting && words.length > 0) activeModules.push('handwriting');
+      if (modSentences && words.length > 0) activeModules.push('sentences');
+      if (modWordSearch && words.length > 0) activeModules.push('wordsearch');
+      if (modMissing && words.length > 0) activeModules.push('missing');
+      if (modScramble && words.length > 0) activeModules.push('scramble');
+      if (modAbc && words.length > 0) activeModules.push('abc');
 
-      if (words.length === 0) {
-        container.innerHTML = `
-          <div style="background: #ffffff; padding: 40px; border-radius: 12px; text-align: center; border: 1px solid #cbd5e1; max-width: 500px;">
-            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">No Words in Worksheet</h3>
-            <p style="font-size: 12px; color: #64748b;">Please add some spelling words in the left panel to generate your printable worksheet.</p>
+      const sheetsContainer = document.getElementById('sheets-container');
+      sheetsContainer.innerHTML = '';
+
+      if (activeModules.length === 0) {
+        sheetsContainer.innerHTML = `
+          <div class="worksheet-sheet ${paperSize === 'letter' ? 'letter-size' : ''} border-classic font-${fontFamily}">
+            <div style="text-align: center; padding: 60px 20px; color: var(--color-slate-500);">
+              <h2 style="font-size: 20px; margin-bottom: 10px;">No Active Modules or Words</h2>
+              <p>Please add some words in Tab 1 and enable at least one activity module in Tab 3.</p>
+            </div>
           </div>
         `;
         return;
       }
 
-      // Build active modules list wrapped in Canva-style activity cards
-      const activePages = [];
+      if (wordSearchData.grid.length === 0 && words.length > 0) {
+        regenerateWordSearch();
+        return;
+      }
 
-      if (modHandwriting) {
-        activePages.push({
-          id: 'handwriting',
-          title: 'Handwriting Practice',
-          render: () => `
+      // Helper for sheet header HTML
+      const renderSheetHeader = (pageNum, totalPages, moduleTitle) => `
+        <div class="sheet-header">
+          ${(incName || incDate || incScore) ? `
+            <div class="student-meta-bar">
+              <div class="meta-left">
+                ${incName ? `<div>Name: <span class="meta-line name-line"></span></div>` : ''}
+                ${incDate ? `<div>Date: <span class="meta-line date-line"></span></div>` : ''}
+              </div>
+              <div class="meta-right">
+                ${gradeUnit ? `<div class="grade-badge">${gradeUnit}</div>` : ''}
+                <div class="page-indicator">Page ${pageNum} of ${totalPages}</div>${incScore ? `<div class="score-badge">Score: _____ / ${words.length}</div>` : ''}
+              </div>
+            </div>
+          ` : ''}
+          <div class="sheet-title-box">
+            <h2 class="sheet-main-title">${title}</h2>
+            <div class="sheet-sub-title">${moduleTitle}</div>
+            <div class="sheet-instructions">${instructions}</div>
+          </div>
+        </div>
+      `;
+
+      const renderSheetFooter = () => `
+        <div class="sheet-footer">
+          <span>Stitch Minded • Spelling & Phonics Worksheets</span>
+          <span>Educational Printable Resource</span>
+        </div>
+      `;
+
+      if (standalonePages) {
+        // One module per page
+        const totalSheets = activeModules.length + (incAnswers ? 1 : 0);
+        let sheetIndex = 1;
+
+        activeModules.forEach(mod => {
+          const sheetDiv = document.createElement('div');
+          sheetDiv.className = `worksheet-sheet ${paperSize === 'letter' ? 'letter-size' : ''} border-classic font-${fontFamily}`;
+          sheetDiv.style.transform = `scale(${zoomLevel / 100})`;
+
+          let modTitle = '';
+          let bodyHtml = '';
+
+          if (mod === 'handwriting') {
+            modTitle = 'Activity: Clean Handwriting Practice';
+            bodyHtml = `
+              <div class="activity-card-container">
+                <div class="module-header">
+                  <div class="module-title-left">
+                    <div class="module-badge">1</div>
+                    <div class="module-heading">Trace & Write Spelling Words</div>
+                  </div>
+                  <div class="module-hint">Practice proper letter formation on the 3-line ruling</div>
+                </div>
+                <div class="handwriting-grid">
+                  ${words.map((w, idx) => `
+                    <div class="handwriting-item">
+                      <div class="word-prompt"><span class="num">${idx + 1}.</span> ${w.word}</div>${Array.from({ length: hwLinesCount }).map(() => `
+                        <div class="ruled-line-box spacing-${hwSpacing}">
+                          <div class="dashed-midline"></div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          } else if (mod === 'sentences') {
+            modTitle = 'Activity: Sentence Completion';
+            bodyHtml = `
+              <div class="activity-card-container">
+                <div class="module-header">
+                  <div class="module-title-left">
+                    <div class="module-badge">2</div>
+                    <div class="module-heading">Fill in the Missing Words</div>
+                  </div>
+                  <div class="module-hint">Select the correct word from the word bank to complete each sentence</div>
+                </div>
+                <div class="word-bank-container">
+                  <span class="word-bank-label">Word Bank:</span>
+                  ${words.map(w => `
+                    <div class="bank-word-card">
+                      <span class="checkbox-square"></span>
+                      ${w.word}
+                    </div>
+                  `).join('')}
+                </div>
+                <div class="sentence-list">
+                  ${words.map((w, idx) => {
+                    const analysis = analyzeSentence(w.word, w.customSentence);
+                    const parts = analysis.blankedSentence.split('______');
+                    return `
+                      <div class="sentence-row">
+                        <span class="sentence-num">${idx + 1}.</span>
+                        <div>
+                          ${parts[0]}<span class="write-blank-line" style="${showSolutionOverlay ? 'color: var(--color-primary); font-weight: 700; text-align: center;' : ''}">${showSolutionOverlay ? w.word : ''}</span>${parts[1] || ''}
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          } else if (mod === 'wordsearch') {
+            modTitle = 'Activity: Word Search Puzzle';
+            const size = wordSearchData.size;
+            bodyHtml = `
+              <div class="activity-card-container">
+                <div class="module-header">
+                  <div class="module-title-left">
+                    <div class="module-badge">3</div>
+                    <div class="module-heading">Find the Hidden Words</div>
+                  </div>
+                  <div class="module-hint">Locate and circle your spelling words in the grid</div>
+                </div>
+                <div class="word-search-layout">
+                  <div class="grid-container" style="grid-template-columns: repeat(${size}, 32px);">
+                    ${wordSearchData.grid.flatMap((row, rIdx) => 
+                      row.map((cell, cIdx) => {
+                        let isHighlighted = false;
+                        if (showSolutionOverlay) {
+                          isHighlighted = wordSearchData.placedWords.some(pw => 
+                            pw.coords.some(([pr, pc]) => pr === rIdx && pc === cIdx)
+                          );
+                        }
+                        return `<div class="grid-cell ${isHighlighted ? 'highlight-solution' : ''}">${cell}</div>`;
+                      })
+                    ).join('')}
+                  </div>
+                  <div class="checklist-container">
+                    <div class="checklist-heading">Word Checklist:</div>
+                    <div class="checklist-grid">
+                      ${words.map(w => `
+                        <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;">
+                          <div style="width: 14px; height: 14px; border: 1.5px solid var(--color-slate-800); border-radius: 3px; background: #fff;"></div>
+                          <span>${w.word}</span>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          } else if (mod === 'missing') {
+            modTitle = 'Activity: Missing Letters';
+            bodyHtml = `
+              <div class="activity-card-container">
+                <div class="module-header">
+                  <div class="module-title-left">
+                    <div class="module-badge">4</div>
+                    <div class="module-heading">Complete the Spelling Words</div>
+                  </div>
+                  <div class="module-hint">Fill in the missing letter tiles and rewrite the full word</div>
+                </div>
+                <div class="missing-letters-grid">
+                  ${words.map((w, idx) => {
+                    const missingData = getMissingLetterWordData(w.word, missingPattern);
+                    return `
+                      <div class="missing-card">
+                        <div class="missing-card-top">
+                          <div class="missing-card-num"><span style="color:var(--color-primary)">#${idx + 1}</span> Phonics Challenge</div>
+                          <div class="missing-card-badge">${missingData.missingCount} missing</div>
+                        </div>
+                        <div class="missing-letter-tiles">
+                          ${missingData.displayChars.map(dc => {
+                            if (dc.isMissing) {
+                              return `<div class="letter-tile blank-tile ${showSolutionOverlay ? 'show-solution' : ''}">${showSolutionOverlay ? dc.char : ''}</div>`;
+                            } else {
+                              return `<div class="letter-tile">${dc.char}</div>`;
+                            }
+                          }).join('')}
+                        </div>
+                        <div class="missing-write-line-row">
+                          <span class="missing-write-label">Write Word:</span>
+                          <div class="missing-write-line">
+                            <div class="midline"></div>
+                            <span style="position: relative; z-index: 2; font-weight: 700; font-size: 13px; ${showSolutionOverlay ? 'color: var(--color-primary);' : 'color: transparent;'}">${showSolutionOverlay ? w.word : ''}</span>
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          } else if (mod === 'scramble') {
+            modTitle = 'Activity: Word Scramble';
+            bodyHtml = `
+              <div class="activity-card-container">
+                <div class="module-header">
+                  <div class="module-title-left">
+                    <div class="module-badge">5</div>
+                    <div class="module-heading">Unscramble the Letters</div>
+                  </div>
+                  <div class="module-hint">Rearrange the jumbled letters to spell each word correctly</div>
+                </div>
+                <div class="scramble-grid">
+                  ${words.map((w, idx) => {
+                    const scrambled = scrambleWord(w.word);
+                    return `
+                      <div class="scramble-card">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                          <span style="font-weight: 700; font-size: 11px; color: var(--color-slate-500);">${idx + 1}.</span>
+                          <div class="letter-badge-row">
+                            ${scrambled.toUpperCase().split('').map(c => `<div class="scramble-letter-badge">${c}</div>`).join('')}
+                          </div>
+                        </div>
+                        <div class="scramble-boxes">
+                          ${w.word.split('').map(() => `<div class="scramble-blank-box"></div>`).join('')}
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          } else if (mod === 'abc') {
+            modTitle = 'Activity: Alphabetical Order';
+            bodyHtml = `
+              <div class="activity-card-container">
+                <div class="module-header">
+                  <div class="module-title-left">
+                    <div class="module-badge">6</div>
+                    <div class="module-heading">Alphabetical (ABC) Sort</div>
+                  </div>
+                  <div class="module-hint">Rewrite your spelling words in alphabetical order</div>
+                </div>
+                <div style="background: #ffffff; border: 1px solid var(--theme-card-border); border-radius: 8px; padding: 14px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px;">
+                  <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-slate-600); width: 100%;">Words to Sort:</span>
+                  ${words.map(w => `<span class="bank-word-card">${w.word}</span>`).join('')}
+                </div>
+                <div class="abc-sort-grid">
+                  ${words.map((w, idx) => `
+                    <div class="abc-sort-row">
+                      <span class="num">${idx + 1}.</span>
+                      <div class="ruled-bottom"></div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          }
+
+          sheetDiv.innerHTML = `
+            <div>
+              ${renderSheetHeader(sheetIndex, totalSheets, modTitle)}
+              ${bodyHtml}
+            </div>
+            ${renderSheetFooter()}
+          `;
+          sheetsContainer.appendChild(sheetDiv);
+          sheetIndex++;
+        });
+
+        // Optional Answer Key Sheet
+        if (incAnswers) {
+          const sheetDiv = document.createElement('div');
+          sheetDiv.className = `worksheet-sheet ${paperSize === 'letter' ? 'letter-size' : ''} border-classic font-${fontFamily}`;
+          sheetDiv.style.transform = `scale(${zoomLevel / 100})`;
+
+          sheetDiv.innerHTML = `
+            <div>
+              ${renderSheetHeader(sheetIndex, totalSheets, 'Teacher Answer Key & Reference')}
+              <div class="activity-card-container">
+                <div class="module-header">
+                  <div class="module-title-left">
+                    <div class="module-badge" style="background: var(--color-emerald-600);">✓</div>
+                    <div class="module-heading">Complete Master Answer Key</div>
+                  </div>
+                  <div class="module-hint">Verified solutions for grading and spelling verification</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                  <div style="background: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid var(--theme-card-border);">
+                    <h4 style="font-size: 12px; text-transform: uppercase; margin-bottom: 8px; color: var(--color-primary);">Spelling Word List & Sentences</h4>
+                    <ul style="padding-left: 18px; font-size: 12px; display: flex; flex-direction: column; gap: 6px;">
+                      ${words.map(w => `<li><strong>${w.word}</strong>:${getCompleteSentence(w.word, w.customSentence)}</li>`).join('')}
+                    </ul>
+                  </div>
+                  <div style="background: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid var(--theme-card-border);">
+                    <h4 style="font-size: 12px; text-transform: uppercase; margin-bottom: 8px; color: var(--color-primary);">Alphabetical Sort Order</h4>
+                    <ol style="padding-left: 18px; font-size: 12px; display: flex; flex-direction: column; gap: 4px;">
+                      {[...words].sort((a, b) => a.word.localeCompare(b.word)).map(w => `<li>${w.word}</li>`).join('')}
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            </div>
+            ${renderSheetFooter()}
+          `;
+          sheetsContainer.appendChild(sheetDiv);
+        }
+
+      } else {
+        // Multi-module single page layout (or compact layout)
+        const sheetDiv = document.createElement('div');
+        sheetDiv.className = `worksheet-sheet ${paperSize === 'letter' ? 'letter-size' : ''} border-classic font-${fontFamily}`;
+        sheetDiv.style.transform = `scale(${zoomLevel / 100})`;
+
+        let bodyHtml = '';
+
+        if (modHandwriting && words.length > 0) {
+          bodyHtml += `
             <div class="activity-card-container">
               <div class="module-header">
                 <div class="module-title-left">
-                  <span class="module-badge">1</span>
-                  <h2 class="module-heading">Handwriting Practice</h2>
+                  <div class="module-badge">1</div>
+                  <div class="module-heading">Trace & Write Spelling Words</div>
                 </div>
-                <span class="module-hint">Write each word neatly on the clean practice lines</span>
+                <div class="module-hint">Practice proper letter formation on the 3-line ruling</div>
               </div>
               <div class="handwriting-grid">
-                ${words.map((item, idx) => `
-                  <div class="handwriting-item avoid-break-inside">
-                    <div class="word-prompt">
-                      <span class="num">${idx + 1}.</span>
-                      <span>${item.word}</span>
-                    </div>
-                    ${Array.from({ length: handwritingLines }).map(() => `
-                      <div class="ruled-line-box spacing-${lineSpacing}">
+                ${words.map((w, idx) => `
+                  <div class="handwriting-item">
+                    <div class="word-prompt"><span class="num">${idx + 1}.</span> ${w.word}</div>${Array.from({ length: hwLinesCount }).map(() => `
+                      <div class="ruled-line-box spacing-${hwSpacing}">
                         <div class="dashed-midline"></div>
                       </div>
                     `).join('')}
@@ -1876,376 +2158,99 @@
                 `).join('')}
               </div>
             </div>
-          `
-        });
-      }
+          `;
+        }
 
-      if (modSentences) {
-        activePages.push({
-          id: 'sentences',
-          title: 'Sentence Completion & Context',
-          render: () => `
+        if (modSentences && words.length > 0) {
+          bodyHtml += `
             <div class="activity-card-container">
               <div class="module-header">
                 <div class="module-title-left">
-                  <span class="module-badge">2</span>
-                  <h2 class="module-heading">Sentence Completion & Context</h2>
+                  <div class="module-badge">2</div>
+                  <div class="module-heading">Sentence Completion</div>
                 </div>
-                <span class="module-hint">Fill in each blank with the correct spelling word</span>
+                <div class="module-hint">Fill in the missing words from the word bank</div>
               </div>
-              <div class="word-bank-container avoid-break-inside">
+              <div class="word-bank-container">
                 <span class="word-bank-label">Word Bank:</span>
-                ${words.map(item => `
-                  <span class="bank-word-card">
+                ${words.map(w => `
+                  <div class="bank-word-card">
                     <span class="checkbox-square"></span>
-                    <span>${item.word}</span>
-                  </span>
+                    ${w.word}
+                  </div>
                 `).join('')}
               </div>
               <div class="sentence-list">
-                ${words.map((item, idx) => {
-                  const blanked = getBlankedSentence(item.word, item.customSentence);
-                  let rendered = '';
-                  if (blanked.includes('______')) {
-                    if (showSolutionOverlay) {
-                      rendered = blanked.split('______').join(`<span class="write-blank-line" style="text-align: center; font-weight: 800; color: #b45309; text-transform: uppercase; border-bottom: 2px solid #b45309; background: #fef3c7; padding: 0 6px; border-radius: 2px;">${item.word}</span>`);
-                    } else {
-                      rendered = blanked.split('______').join('<span class="write-blank-line"></span>');
-                    }
-                  } else {
-                    rendered = `${blanked} <span class="write-blank-line"></span>`;
-                  }
+                ${words.map((w, idx) => {
+                  const analysis = analyzeSentence(w.word, w.customSentence);
+                  const parts = analysis.blankedSentence.split('______');
                   return `
-                    <div class="sentence-row avoid-break-inside">
+                    <div class="sentence-row">
                       <span class="sentence-num">${idx + 1}.</span>
-                      <div>${rendered}</div>
+                      <div>
+                        ${parts[0]}<span class="write-blank-line" style="${showSolutionOverlay ? 'color: var(--color-primary); font-weight: 700; text-align: center;' : ''}">${showSolutionOverlay ? w.word : ''}</span>${parts[1] || ''}
+                      </div>
                     </div>
                   `;
                 }).join('')}
               </div>
             </div>
-          `
-        });
-      }
-
-      if (modWordSearch && wordSearchData.grid.length > 0) {
-        const solutionCoords = new Set();
-        if (showSolutionOverlay) {
-          wordSearchData.placedWords.forEach(pw => {
-            pw.coords.forEach(([r, c]) => solutionCoords.add(`${r}-${c}`));
-          });
+          `;
         }
 
-        activePages.push({
-          id: 'wordsearch',
-          title: 'Word Search Puzzle',
-          render: () => `
+        if (modWordSearch && words.length > 0) {
+          const size = wordSearchData.size;
+          bodyHtml += `
             <div class="activity-card-container">
               <div class="module-header">
                 <div class="module-title-left">
-                  <span class="module-badge">3</span>
-                  <h2 class="module-heading">Word Search Puzzle</h2>
+                  <div class="module-badge">3</div>
+                  <div class="module-heading">Word Search Puzzle</div>
                 </div>
-                <span class="module-hint">Find and circle all hidden spelling words</span>
+                <div class="module-hint">Find and circle hidden words</div>
               </div>
-              <div class="word-search-layout avoid-break-inside">
-                <div class="grid-container" style="grid-template-columns: repeat(${wordSearchData.size}, 32px);">
-                  ${wordSearchData.grid.map((row, rIdx) =>
+              <div class="word-search-layout">
+                <div class="grid-container" style="grid-template-columns: repeat(${size}, 28px);">
+                  ${wordSearchData.grid.flatMap((row, rIdx) => 
                     row.map((cell, cIdx) => {
-                      const isSol = solutionCoords.has(`${rIdx}-${cIdx}`);
-                      return `<div class="grid-cell ${isSol ? 'highlight-solution' : ''}">${cell}</div>`;
-                    }).join('')
+                      let isHighlighted = false;
+                      if (showSolutionOverlay) {
+                        isHighlighted = wordSearchData.placedWords.some(pw => 
+                          pw.coords.some(([pr, pc]) => pr === rIdx && pc === cIdx)
+                        );
+                      }
+                      return `<div class="grid-cell" style="width:28px; height:28px; font-size:12px; ${isHighlighted ? 'background:#fef08a; color:#000;' : ''}">${cell}</div>`;
+                    })
                   ).join('')}
                 </div>
                 <div class="checklist-container">
-                  <div class="checklist-heading">Words to Find (${wordSearchData.placedWords.length}):</div>
+                  <div class="checklist-heading">Word Checklist:</div>
                   <div class="checklist-grid">
-                    ${wordSearchData.placedWords.map(pw => `
-                      <span class="bank-word-card">
-                        <span class="checkbox-square"></span>
-                        <span>${pw.word}</span>
-                      </span>
+                    ${words.map(w => `
+                      <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700;">
+                        <div style="width: 12px; height: 12px; border: 1.5px solid var(--color-slate-800); border-radius: 2px; background: #fff;"></div>
+                        <span>${w.word}</span>
+                      </div>
                     `).join('')}
                   </div>
                 </div>
               </div>
             </div>
-          `
-        });
-      }
-
-      if (modMissingLetters) {
-        activePages.push({
-          id: 'missingletters',
-          title: 'Missing Letters (Fill-in-the-Blanks)',
-          render: () => `
-            <div class="activity-card-container">
-              <div class="module-header">
-                <div class="module-title-left">
-                  <span class="module-badge">4</span>
-                  <h2 class="module-heading">Missing Letters (Fill-in-the-Blanks)</h2>
-                </div>
-                <span class="module-hint">Sound out each word and fill in the missing letters, then write the full word</span>
-              </div>
-              <div class="word-bank-container avoid-break-inside">
-                <span class="word-bank-label">Word Bank:</span>
-                ${words.map(item => `
-                  <span class="bank-word-card">
-                    <span class="checkbox-square"></span>
-                    <span>${item.word}</span>
-                  </span>
-                `).join('')}
-              </div>
-              <div class="missing-letters-grid">
-                ${words.map((item, idx) => {
-                  const letterData = getMissingLetterWordData(item.word, missingPattern);
-                  return `
-                    <div class="missing-card avoid-break-inside">
-                      <div class="missing-card-top">
-                        <div class="missing-card-num">
-                          <span class="module-badge" style="width: 20px; height: 20px; font-size: 11px;">${idx + 1}</span>
-                          <span>Word #${idx + 1}</span>
-                        </div>
-                        <span class="missing-card-badge">${letterData.missingCount} Missing ${letterData.missingCount === 1 ? 'Letter' : 'Letters'}</span>
-                      </div>
-                      <div class="missing-letter-tiles">
-                        ${letterData.displayChars.map(tile => {
-                          if (tile.isMissing) {
-                            return `
-                              <div class="letter-tile blank-tile ${showSolutionOverlay ? 'show-solution' : ''}">
-                                ${showSolutionOverlay ? tile.char : ''}
-                              </div>
-                            `;
-                          }
-                          return `<div class="letter-tile">${tile.char}</div>`;
-                        }).join('')}
-                      </div>
-                      <div class="missing-write-line-row">
-                        <span class="missing-write-label">Write Full Word:</span>
-                        <div class="missing-write-line">
-                          <div class="midline"></div>
-                          ${showSolutionOverlay ? `<span style="font-size: 12px; font-weight: 800; color: #b45309; text-transform: uppercase; letter-spacing: 0.1em; z-index: 2;">${item.word}</span>` : ''}
-                        </div>
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
-          `
-        });
-      }
-
-      if (modScramble) {
-        activePages.push({
-          id: 'scramble',
-          title: 'Word Scramble',
-          render: () => `
-            <div class="activity-card-container">
-              <div class="module-header">
-                <div class="module-title-left">
-                  <span class="module-badge">5</span>
-                  <h2 class="module-heading">Word Scramble</h2>
-                </div>
-                <span class="module-hint">Unscramble the letters to spell each word correctly</span>
-              </div>
-              <div class="scramble-grid">
-                ${words.map((item, idx) => {
-                  const scrambled = scrambleWord(item.word);
-                  return `
-                    <div class="scramble-card avoid-break-inside">
-                      <div class="letter-badge-row">
-                        <span style="font-size: 11px; font-weight: 700; color: #64748b; margin-right: 4px;">${idx + 1}.</span>
-                        ${scrambled.split('').map(l => `<span class="scramble-letter-badge">${l}</span>`).join('')}
-                      </div>
-                      <div class="scramble-boxes">
-                        <span style="color: #94a3b8; font-weight: 700; margin-right: 4px;">➔</span>
-                        ${Array.from({ length: item.word.length }).map(() => `<span class="scramble-blank-box"></span>`).join('')}
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
-          `
-        });
-      }
-
-      if (modAbc) {
-        activePages.push({
-          id: 'abc',
-          title: 'Alphabetical Order',
-          render: () => `
-            <div class="activity-card-container">
-              <div class="module-header">
-                <div class="module-title-left">
-                  <span class="module-badge">6</span>
-                  <h2 class="module-heading">Alphabetical Order (ABC Sort)</h2>
-                </div>
-                <span class="module-hint">Write the spelling words in alphabetical order from A to Z</span>
-              </div>
-              <div class="abc-sort-grid">
-                ${words.map((_, idx) => `
-                  <div class="abc-sort-row avoid-break-inside">
-                    <span class="num">${idx + 1}.</span>
-                    <span class="ruled-bottom"></span>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          `
-        });
-      }
-
-      const totalPages = activePages.length;
-
-      // Render standalone multi-page layout
-      if (standalonePages) {
-        let html = '';
-        activePages.forEach((page, pageIdx) => {
-          html += `
-            <article class="worksheet-sheet theme-${theme} font-${fontFamily} ${paperSize === 'letter' ? 'letter-size' : ''} border-classic" data-theme="${theme}" style="transform: scale(${zoomLevel / 100});">
-              <div>
-                <!-- Header -->
-                <header class="sheet-header avoid-break-inside">
-                  <div class="student-meta-bar">
-                    <div class="meta-left">
-                      ${incName ? `<div><strong>Name:</strong> <span class="meta-line name-line"></span></div>` : ''}
-                      ${incDate ? `<div><strong>Date:</strong> <span class="meta-line date-line"></span></div>` : ''}
-                      ${gradeUnit ? `<div class="grade-badge">${gradeUnit}</div>` : ''}
-                    </div>
-                    <div class="meta-right">
-                      ${totalPages > 1 ? `<span class="page-indicator">Page ${pageIdx + 1} of ${totalPages}</span>` : ''}
-                      ${incScore ? `<div class="score-badge"><span>Score:</span> <span class="meta-line" style="min-width: 30px;"></span> <span>/ 10</span></div>` : ''}
-                    </div>
-                  </div>
-                  <div class="sheet-title-box">
-                    <h1 class="sheet-main-title">${title}</h1>
-                    ${instructions ? `<p class="sheet-instructions">${instructions}</p>` : ''}
-                  </div>
-                </header>
-
-                <!-- Activity Module Content -->
-                <div style="margin-top: 10px;">
-                  ${page.render()}
-                </div>
-              </div>
-
-              <!-- Footer -->
-              <footer class="sheet-footer avoid-break-inside">
-                <span>🌟 Practice Makes Progress!</span>
-                <span>${title} • Page ${pageIdx + 1} of ${totalPages}</span>
-              </footer>
-            </article>
-          `;
-        });
-
-        // Optional Answer Key Page
-        if (incAnswers) {
-          const sorted = [...words].sort((a, b) => a.word.localeCompare(b.word));
-          html += `
-            <article class="worksheet-sheet theme-${theme} font-${fontFamily} ${paperSize === 'letter' ? 'letter-size' : ''} border-classic" data-theme="${theme}" style="transform: scale(${zoomLevel / 100});">
-              <div>
-                <header class="sheet-header avoid-break-inside">
-                  <div style="text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px;">
-                    <span style="display: inline-block; padding: 2px 10px; background: #0f172a; color: #fff; font-size: 11px; font-weight: 700; border-radius: 4px; text-transform: uppercase; margin-bottom: 6px;">Teacher Edition</span>
-                    <h1 class="sheet-main-title">${title} — Solutions</h1>
-                  </div>
-                </header>
-
-                <div style="display: flex; flex-direction: column; gap: 20px;">
-                  <!-- Sentence Completion Solutions -->
-                  ${modSentences ? `
-                    <div style="padding: 16px; background: var(--theme-card-bg); border: 1.5px solid var(--theme-card-border); border-radius: 12px;">
-                      <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Sentence Completion Solutions:</h3>
-                      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
-                        ${words.map((item, idx) => {
-                          const complete = getCompleteSentence(item.word, item.customSentence);
-                          const blanked = getBlankedSentence(item.word, item.customSentence);
-                          const parts = blanked.split('______');
-                          let displayHtml = '';
-                          if (parts.length >= 2) {
-                            displayHtml = `${parts[0]}<strong style="text-decoration: underline; color: #4338ca; background: #e0e7ff; padding: 1px 6px; border-radius: 4px; text-transform: uppercase;">${item.word}</strong>${parts.slice(1).join('')}`;
-                          } else {
-                            displayHtml = complete;
-                          }
-                          return `
-                            <div style="background: #ffffff; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; gap: 8px;">
-                              <strong style="color: #475569;">${idx + 1}.</strong>
-                              <div>${displayHtml}</div>
-                            </div>
-                          `;
-                        }).join('')}
-                      </div>
-                    </div>
-                  ` : ''}
-
-                  <div style="padding: 16px; background: var(--theme-card-bg); border: 1.5px solid var(--theme-card-border); border-radius: 12px;">
-                    <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Master Word List:</h3>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                      ${words.map((item, idx) => `
-                        <span class="bank-word-card"><strong>${idx + 1}.</strong> ${item.word}</span>
-                      `).join('')}
-                    </div>
-                  </div>
-
-                  ${modAbc ? `
-                    <div style="padding: 16px; background: var(--theme-card-bg); border: 1.5px solid var(--theme-card-border); border-radius: 12px;">
-                      <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Alphabetical Sort Solution:</h3>
-                      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
-                        ${sorted.map((item, idx) => `<div>${idx + 1}. ${item.word}</div>`).join('')}
-                      </div>
-                    </div>
-                  ` : ''}
-                </div>
-              </div>
-
-              <footer class="sheet-footer avoid-break-inside">
-                <span>Teacher Answer Key & Solutions</span>
-                <span>${title}</span>
-              </footer>
-            </article>
           `;
         }
 
-        container.innerHTML = html;
-      } else {
-        // Continuous single sheet layout
-        container.innerHTML = `
-          <article class="worksheet-sheet theme-${theme} font-${fontFamily} ${paperSize === 'letter' ? 'letter-size' : ''} border-classic" data-theme="${theme}" style="transform: scale(${zoomLevel / 100});">
-            <div>
-              <header class="sheet-header avoid-break-inside">
-                <div class="student-meta-bar">
-                  <div class="meta-left">
-                    ${incName ? `<div><strong>Name:</strong> <span class="meta-line name-line"></span></div>` : ''}
-                    ${incDate ? `<div><strong>Date:</strong> <span class="meta-line date-line"></span></div>` : ''}
-                    ${gradeUnit ? `<div class="grade-badge">${gradeUnit}</div>` : ''}
-                  </div>
-                  <div class="meta-right">
-                    ${incScore ? `<div class="score-badge"><span>Score:</span> <span class="meta-line" style="min-width: 30px;"></span> <span>/ 10</span></div>` : ''}
-                  </div>
-                </div>
-                <div class="sheet-title-box">
-                  <h1 class="sheet-main-title">${title}</h1>
-                  ${instructions ? `<p class="sheet-instructions">${instructions}</p>` : ''}
-                </div>
-              </header>
-
-              <div style="display: flex; flex-direction: column; gap: 20px;">
-                ${activePages.map(p => p.render()).join('')}
-              </div>
-            </div>
-
-            <footer class="sheet-footer avoid-break-inside">
-              <span>🌟 Practice Makes Progress!</span>
-              <span>${title}</span>
-            </footer>
-          </article>
+        sheetDiv.innerHTML = `
+          <div>
+            ${renderSheetHeader(1, 1, 'Spelling & Phonics Practice')}
+            ${bodyHtml}
+          </div>
+          ${renderSheetFooter()}
         `;
+        sheetsContainer.appendChild(sheetDiv);
       }
     }
 
-    // Initialize on load
+    // Initial render on load
     window.addEventListener('DOMContentLoaded', () => {
       regenerateWordSearch();
       renderApp();
