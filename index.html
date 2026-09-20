@@ -1377,17 +1377,66 @@
     let showSolutionOverlay = false;
     let zoomLevel = 100;
 
-    /* DEFAULT SENTENCE GENERATOR */
-    function getDefaultSentence(word) {
-      const templates = [
-        `The ______ is very special to us.`,
-        `I can see a ______ over there.`,
-        `Please look at the ______ right now.`,
-        `We found a neat ______ in the storybook.`,
-        `She showed me how to draw a ______.`
-      ];
-      const code = word.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      return templates[code % templates.length];
+    /* SENTENCE PROCESSING UTILITIES */
+    function escapeRegExp(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function getBlankedSentence(word, customSentence) {
+      if (customSentence && customSentence.trim().length > 0) {
+        const trimmed = customSentence.trim();
+        if (trimmed.includes('______')) {
+          return trimmed;
+        }
+        const escaped = escapeRegExp(word.trim());
+        const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+        if (regex.test(trimmed)) {
+          return trimmed.replace(regex, '______');
+        }
+        return `${trimmed} ______`;
+      }
+      return getDefaultSentence(word);
+    }
+
+    function getCompleteSentence(word, customSentence) {
+      if (customSentence && customSentence.trim().length > 0) {
+        const trimmed = customSentence.trim();
+        if (trimmed.includes('______')) {
+          return trimmed.replace('______', word);
+        }
+        return trimmed;
+      }
+      const defaultS = getDefaultSentence(word);
+      return defaultS.replace('______', word);
+    }
+
+    function analyzeSentence(word, customSentence) {
+      const hasCustom = Boolean(customSentence && customSentence.trim().length > 0);
+      const originalSentence = hasCustom ? customSentence.trim() : getDefaultSentence(word);
+      const blankedSentence = getBlankedSentence(word, customSentence);
+      
+      let matchType = 'default';
+      if (hasCustom) {
+        if (customSentence.includes('______')) {
+          matchType = 'explicit-blank';
+        } else {
+          const escaped = escapeRegExp(word.trim());
+          const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+          if (regex.test(customSentence)) {
+            matchType = 'auto-blanked';
+          } else {
+            matchType = 'fallback-blank';
+          }
+        }
+      }
+      return {
+        word,
+        hasCustom,
+        originalSentence,
+        blankedSentence,
+        completeSentence: getCompleteSentence(word, customSentence),
+        matchType
+      };
     }
 
     /* WORD SEARCH GENERATOR ALGORITHM */
@@ -1663,22 +1712,38 @@
       }
 
       previewBox.innerHTML = words.map((item, idx) => {
-        const defaultSentence = getDefaultSentence(item.word);
-        const hasCustom = Boolean(item.customSentence && item.customSentence.trim().length > 0);
-        const sentence = hasCustom ? item.customSentence.trim() : defaultSentence;
+        const analysis = analyzeSentence(item.word, item.customSentence);
+        let badgeStyle = 'background: #f1f5f9; color: #64748b;';
+        let badgeText = 'Auto-Default';
+        if (analysis.matchType === 'auto-blanked') {
+          badgeStyle = 'background: #d1fae5; color: #065f46; font-weight: 700; border: 1px solid #6ee7b7;';
+          badgeText = '✓ Auto-Blanked';
+        } else if (analysis.matchType === 'explicit-blank') {
+          badgeStyle = 'background: #dbeafe; color: #1e40af; font-weight: 700; border: 1px solid #93c5fd;';
+          badgeText = 'Custom Blank';
+        } else if (analysis.matchType === 'fallback-blank') {
+          badgeStyle = 'background: #fef3c7; color: #92400e; font-weight: 700; border: 1px solid #fde68a;';
+          badgeText = 'Custom + Blank';
+        }
+
         return `
-          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; font-size: 11px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 11px; display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="font-weight: 700; color: var(--color-primary); text-transform: uppercase;">
                 ${idx + 1}. ${item.word}
               </span>
-              <span style="font-size: 9px; padding: 1px 6px; border-radius: 4px; ${hasCustom ? 'background: #fef3c7; color: #92400e; font-weight: 600;' : 'background: #f1f5f9; color: #64748b;'}">
-                ${hasCustom ? 'Custom' : 'Auto-Default'}
+              <span style="font-size: 9px; padding: 2px 6px; border-radius: 9999px; ${badgeStyle}">
+                ${badgeText}
               </span>
             </div>
-            <div style="color: #475569; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-              "${sentence}"
+            <div style="background: #f8fafc; padding: 4px 6px; border-radius: 4px; border: 1px solid #f1f5f9; font-size: 10px; color: #334155;">
+              <strong style="color: #64748b; font-size: 9px; text-transform: uppercase;">Student:</strong> "${analysis.blankedSentence}"
             </div>
+            ${analysis.hasCustom ? `
+              <div style="font-size: 10px; color: #64748b; padding-left: 2px;">
+                <span style="font-weight: 600; text-transform: uppercase; font-size: 9px;">Key:</span> "${analysis.originalSentence}"
+              </div>
+            ` : ''}
           </div>
         `;
       }).join('');
@@ -1832,14 +1897,16 @@
               </div>
               <div class="sentence-list">
                 ${words.map((item, idx) => {
-                  let sentence = item.customSentence?.trim() || getDefaultSentence(item.word);
-                  // Replace blank or word with blank line
+                  const blanked = getBlankedSentence(item.word, item.customSentence);
                   let rendered = '';
-                  if (sentence.includes('______')) {
-                    rendered = sentence.split('______').join('<span class="write-blank-line"></span>');
+                  if (blanked.includes('______')) {
+                    if (showSolutionOverlay) {
+                      rendered = blanked.split('______').join(`<span class="write-blank-line" style="text-align: center; font-weight: 800; color: #b45309; text-transform: uppercase; border-bottom: 2px solid #b45309; background: #fef3c7; padding: 0 6px; border-radius: 2px;">${item.word}</span>`);
+                    } else {
+                      rendered = blanked.split('______').join('<span class="write-blank-line"></span>');
+                    }
                   } else {
-                    const reg = new RegExp(`\\b${item.word}\\b`, 'gi');
-                    rendered = sentence.replace(reg, '<span class="write-blank-line"></span>');
+                    rendered = `${blanked} <span class="write-blank-line"></span>`;
                   }
                   return `
                     <div class="sentence-row avoid-break-inside">
@@ -2080,6 +2147,32 @@
                 </header>
 
                 <div style="display: flex; flex-direction: column; gap: 20px;">
+                  <!-- Sentence Completion Solutions -->
+                  ${modSentences ? `
+                    <div style="padding: 16px; background: var(--theme-card-bg); border: 1.5px solid var(--theme-card-border); border-radius: 12px;">
+                      <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Sentence Completion Solutions:</h3>
+                      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
+                        ${words.map((item, idx) => {
+                          const complete = getCompleteSentence(item.word, item.customSentence);
+                          const blanked = getBlankedSentence(item.word, item.customSentence);
+                          const parts = blanked.split('______');
+                          let displayHtml = '';
+                          if (parts.length >= 2) {
+                            displayHtml = `${parts[0]}<strong style="text-decoration: underline; color: #4338ca; background: #e0e7ff; padding: 1px 6px; border-radius: 4px; text-transform: uppercase;">${item.word}</strong>${parts.slice(1).join('')}`;
+                          } else {
+                            displayHtml = complete;
+                          }
+                          return `
+                            <div style="background: #ffffff; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; gap: 8px;">
+                              <strong style="color: #475569;">${idx + 1}.</strong>
+                              <div>${displayHtml}</div>
+                            </div>
+                          `;
+                        }).join('')}
+                      </div>
+                    </div>
+                  ` : ''}
+
                   <div style="padding: 16px; background: var(--theme-card-bg); border: 1.5px solid var(--theme-card-border); border-radius: 12px;">
                     <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Master Word List:</h3>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px;">
